@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+<title>حياتي الافتراضية</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.7/babel.min.js"></script>
+<style>
+  html, body { margin:0; padding:0; }
+  * { -webkit-tap-highlight-color: transparent; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useRef, useMemo } = React;
+
+function IconFactory(emoji) {
+  return function Icon({ size = 16, className = "" }) {
+    return <span className={className} style={{ fontSize: size, lineHeight: 1, display: "inline-block" }}>{emoji}</span>;
+  };
+}
+const Wallet = IconFactory("💰");
+const RotateCcw = IconFactory("🔄");
+const X = IconFactory("✖️");
+const Hammer = IconFactory("🔨");
+const Volume2 = IconFactory("🔊");
+const VolumeX = IconFactory("🔇");
+const Sparkles = IconFactory("✨");
+const ChevronLeft = IconFactory("‹");
+
+
+/* ---------------------------------- ثوابت اللعبة ---------------------------------- */
+
+const HOUSES = [
+  { id: "poor", name: "بيت بسيط", price: 300, emoji: "🏠", desc: "بداية متواضعة لكن دافئة", bedrooms: 1, area: 70, features: [] },
+  { id: "apartment_small", name: "شقة صغيرة", price: 800, emoji: "🏢", desc: "شقة عملية بمدينة صاخبة", bedrooms: 1, area: 60, features: ["قريبة من الخدمات"] },
+  { id: "medium", name: "بيت متوسط", price: 1500, emoji: "🏡", desc: "مساحة مريحة للعائلة", bedrooms: 3, area: 150, features: ["حديقة"] },
+  { id: "desert_villa", name: "استراحة صحراوية", price: 2600, emoji: "🏜️", desc: "هدوء الصحراء وسمائها الصافية", bedrooms: 3, area: 250, features: ["إطلالة صحراء"] },
+  { id: "farm", name: "بيت المزرعة", price: 2200, emoji: "🌾", desc: "هدوء الريف وخضرته", bedrooms: 3, area: 300, features: ["حديقة كبيرة"] },
+  { id: "mountain", name: "بيت الجبل", price: 3200, emoji: "⛰️", desc: "عزلة جميلة بين القمم", bedrooms: 4, area: 180, features: ["إطلالة جبل"] },
+  { id: "apartment_lux", name: "شقة فاخرة", price: 3500, emoji: "🏙️", desc: "شقة عصرية بإطلالة على المدينة", bedrooms: 3, area: 180, features: ["إطلالة مدينة", "مسبح مشترك"] },
+  { id: "beach", name: "بيت على البحر", price: 4000, emoji: "🏖️", desc: "إطلالة ساحرة على الموج", bedrooms: 4, area: 220, features: ["إطلالة بحر", "مسبح"] },
+  { id: "luxury", name: "فيلا فاخرة", price: 5000, emoji: "🏰", desc: "رفاهية بلا حدود", bedrooms: 6, area: 400, features: ["مسبح", "حديقة", "إطلالة"] },
+  { id: "palace", name: "قصر ملكي", price: 12000, emoji: "🏯", desc: "قمة الفخامة والرفاهية", bedrooms: 10, area: 900, features: ["مسبح", "حديقة", "إطلالة", "مصعد خاص"] },
+];
+
+const ESTATE_FILTERS = [
+  { id: "all", label: "الكل", test: () => true },
+  { id: "pool", label: "🏊 فيها مسبح", test: (h) => h.features.some((f) => f.includes("مسبح")) },
+  { id: "view", label: "🌅 فيها إطلالة", test: (h) => h.features.some((f) => f.includes("إطلالة")) },
+  { id: "cheap", label: "💰 أقل من 2000$", test: (h) => h.price < 2000 },
+  { id: "luxury", label: "✨ فخمة", test: (h) => h.price >= 4000 },
+];
+
+const CLOTHES = [
+  { id: "casual", name: "كاجوال", price: 0, emoji: "👕" },
+  { id: "formal", name: "رسمي", price: 80, emoji: "🥼" },
+  { id: "sporty", name: "رياضي", price: 60, emoji: "🎽" },
+  { id: "royal", name: "فاخر", price: 200, emoji: "👘" },
+];
+
+const SHOPS = {
+  veggies: { name: "سوق الخضار", emoji: "🥦", items: [["طماطم", 5], ["خيار", 4], ["بطاطس", 3]] },
+  fruits: { name: "سوق الفواكه", emoji: "🍎", items: [["تفاح", 6], ["موز", 5], ["برتقال", 5]] },
+  sweets: { name: "سوق الحلويات", emoji: "🍫", items: [["شوكولاتة", 8], ["كيك", 15], ["رقائق بطاطس", 4]] },
+  meat: { name: "سوق اللحوم", emoji: "🥩", items: [["لحم بقر", 20], ["دجاج", 12]] },
+  fish: { name: "سوق السمك", emoji: "🐟", items: [["سمك", 15], ["روبيان", 18]] },
+  home: { name: "مستلزمات المنزل", emoji: "🛋️", items: [["أثاث", 50], ["ديكور", 30], ["مسبح 🏊", 200]] },
+  cafe: { name: "كافيه", emoji: "☕", items: [["قهوة", 10], ["عصير", 8], ["شاي", 6], ["كيك صغير", 12]] },
+  restaurant: { name: "مطعم", emoji: "🍽️", items: [["برجر", 15], ["بيتزا", 20], ["باستا", 18], ["سلطة", 10]] },
+  supermarket: { name: "سوبر ماركت", emoji: "🛒", items: [["حليب", 6], ["خبز", 4], ["بيض", 7], ["أرز", 10], ["سكر", 8], ["مناديل", 5], ["منظف", 9]] },
+  phones: { name: "متجر الهواتف", emoji: "📱", items: [["هاتف اقتصادي", 300], ["هاتف متوسط", 700], ["هاتف فاخر", 1500]] },
+  perfumes: { name: "متجر العطور", emoji: "🌸", items: [["عطر خفيف", 40], ["عطر فاخر", 90], ["عطر نادر", 180]] },
+  mallclothes: { name: "متجر الملابس", emoji: "👗", items: [["فستان سهرة", 120], ["بدلة رسمية", 150], ["حذاء رياضي", 70], ["نظارة شمس", 35]] },
+};
+
+const HOSPITAL_QUESTIONS = [
+  { q: "شخص عنده جرح بسيط، أول إسعاف؟", options: ["تنظيف الجرح وتغطيته", "تجاهله", "سكب ماء ساخن", "لا شيء"], answer: "تنظيف الجرح وتغطيته" },
+  { q: "كم عدد حجرات القلب؟", options: ["2", "3", "4", "5"], answer: "4" },
+  { q: "أي فيتامين تصنعه الشمس بالجسم؟", options: ["A", "B12", "C", "D"], answer: "D" },
+  { q: "العظم الأطول بجسم الإنسان؟", options: ["عظم الفخذ", "عظم الذراع", "عظم الترقوة", "عظم الساق"], answer: "عظم الفخذ" },
+];
+const POLICE_QUESTIONS = [
+  { q: "لو شفت حادث سيارة، أول شي تسويه؟", options: ["تتصل بالطوارئ", "تكمل طريقك", "تصوّر بس", "تهرب"], answer: "تتصل بالطوارئ" },
+  { q: "إشارة المرور الحمراء تعني؟", options: ["قف", "استمر", "أسرع", "انعطف"], answer: "قف" },
+  { q: "الحزام أثناء القيادة يُلبس متى؟", options: ["دايماً", "بس بالسفر", "لما فيه شرطي", "ما يلزم"], answer: "دايماً" },
+  { q: "أول شي تسويه لو لقيت طفل تائه؟", options: ["تساعده وتبلغ الجهات المختصة", "تتجاهله", "تصوره", "تتركه"], answer: "تساعده وتبلغ الجهات المختصة" },
+];
+const FIRE_QUESTIONS = [
+  { q: "لو شب حريق صغير بزيت المقلاة، تطفيه بـ؟", options: ["غطاء المقلاة", "ماء", "تجاهله", "بنزين"], answer: "غطاء المقلاة" },
+  { q: "أول شي تسويه عند سماع جرس الحريق؟", options: ["تخرج بهدوء من أقرب مخرج", "تختبئ تحت الطاولة", "تكمل شغلك", "تاخذ المصعد"], answer: "تخرج بهدوء من أقرب مخرج" },
+  { q: "جهاز إطفاء الحريق اليدوي يسمى؟", options: ["طفاية الحريق", "مروحة", "مضخة ماء", "خرطوم غاز"], answer: "طفاية الحريق" },
+  { q: "عند وجود دخان كثيف بالغرفة، الأصح؟", options: ["تزحف قريب من الأرض", "تقف منتصب", "تفتح كل النوافذ وتقف بمنتصفها", "تختبئ بالدولاب"], answer: "تزحف قريب من الأرض" },
+];
+
+const BUYER_NAMES = ["أبو فهد", "أم سارة", "خالد التاجر", "شركة العقار الذهبي", "نورة المستثمرة", "أبو تركي"];
+
+const VEHICLES_BY_ZONE = {
+  stable: [{ id: "horse", name: "حصان", price: 600, emoji: "🐴" }],
+  car: [
+    { id: "scooter", name: "سكوتر", price: 500, emoji: "🛴" },
+    { id: "carv", name: "سيارة", price: 3000, emoji: "🚗" },
+  ],
+  bus: [{ id: "busv", name: "باص شخصي", price: 8000, emoji: "🚌" }],
+};
+const ALL_VEHICLES = Object.values(VEHICLES_BY_ZONE).flat();
+
+const QUIZ_QUESTIONS = [
+  { q: "كم ناتج 5 + 7؟", options: ["10", "11", "12", "13"], answer: "12" },
+  { q: "ما هي عاصمة السعودية؟", options: ["جدة", "الرياض", "الدمام", "مكة"], answer: "الرياض" },
+  { q: "كم عدد أيام الأسبوع؟", options: ["5", "6", "7", "8"], answer: "7" },
+  { q: "ما ناتج 9 × 3؟", options: ["18", "21", "24", "27"], answer: "27" },
+  { q: "ما أكبر قارة في العالم؟", options: ["أفريقيا", "آسيا", "أوروبا", "أمريكا"], answer: "آسيا" },
+  { q: "كم ناتج 100 ÷ 4؟", options: ["15", "20", "25", "30"], answer: "25" },
+  { q: "كم عدد شهور السنة؟", options: ["10", "11", "12", "13"], answer: "12" },
+  { q: "ما ناتج 8 − 3؟", options: ["4", "5", "6", "7"], answer: "5" },
+];
+
+const NPC_LINES = [
+  "أهلاً! جو اليوم جميل 🌤️", "وش أخبارك اليوم؟", "شفت بيتك الجديد، حلو مرة!",
+  "ودي أروح السوق، تجي معي؟", "اليوم عندي دوام بالمطعم 😅", "تعال نروح الملاهي!",
+  "اشتقتلك، وين كنت؟", "شريت شي جديد اليوم؟", "الجو عند البحر رائع الحين 🌊",
+  "شكلك تعبان اليوم، خذ راحتك 😊", "وش رأيك نطلع برحلة بكرة؟",
+];
+
+const FRIENDS = [
+  { id: "sara", name: "سارة", emoji: "👩" },
+  { id: "khaled", name: "خالد", emoji: "🧑" },
+  { id: "noura", name: "نورة", emoji: "👧" },
+  { id: "fahad", name: "فهد", emoji: "🧔" },
+];
+
+function ageCategory(age) {
+  if (age < 13) return "child";
+  if (age < 20) return "teen";
+  if (age < 60) return "adult";
+  return "elder";
+}
+function avatarEmoji(gender, age) {
+  const cat = ageCategory(age);
+  const table = {
+    male: { child: "👦", teen: "🧑", adult: "👨", elder: "👴" },
+    female: { child: "👧", teen: "👩‍🦱", adult: "👩", elder: "👵" },
+  };
+  return table[gender][cat];
+}
+function shuffleArray(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+
+/* ---------------------------------- الصوت ---------------------------------- */
+
+function useSound() {
+  const ctxRef = useRef(null);
+  const enabledRef = useRef(true);
+  const musicTimerRef = useRef(null);
+
+  const getCtx = () => {
+    if (!ctxRef.current) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      ctxRef.current = new AC();
+    }
+    return ctxRef.current;
+  };
+
+  const tone = (freq, dur, type = "sine", vol = 0.15, delay = 0) => {
+    if (!enabledRef.current) return;
+    try {
+      const ctx = getCtx();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = type;
+      o.frequency.value = freq;
+      o.connect(g);
+      g.connect(ctx.destination);
+      const t0 = ctx.currentTime + delay;
+      g.gain.setValueAtTime(vol, t0);
+      g.gain.exponentialRampToValueAtTime(0.001, t0 + dur);
+      o.start(t0);
+      o.stop(t0 + dur + 0.02);
+    } catch (e) { /* audio unavailable */ }
+  };
+
+  const sounds = {
+    cash: () => { tone(700, 0.09, "square", 0.12); tone(1100, 0.12, "square", 0.12, 0.09); },
+    splash: () => { tone(300, 0.15, "sawtooth", 0.08); tone(180, 0.2, "sawtooth", 0.06, 0.05); },
+    door: () => { tone(260, 0.08, "triangle", 0.1); tone(160, 0.12, "triangle", 0.08, 0.07); },
+    click: () => tone(600, 0.05, "sine", 0.08),
+    buzz: () => tone(140, 0.15, "sawtooth", 0.1),
+    ride: () => { tone(200, 0.1, "sawtooth", 0.1); tone(400, 0.15, "sawtooth", 0.08, 0.1); },
+    chime: () => { tone(880, 0.12, "sine", 0.1); tone(1320, 0.18, "sine", 0.08, 0.12); },
+  };
+
+  const setEnabled = (v) => { enabledRef.current = v; };
+
+  const startMusic = () => {
+    if (musicTimerRef.current) return;
+    const notes = [523, 659, 784, 659, 523, 440];
+    let i = 0;
+    musicTimerRef.current = setInterval(() => {
+      if (enabledRef.current) tone(notes[i % notes.length], 0.5, "sine", 0.035);
+      i++;
+    }, 700);
+  };
+  const stopMusic = () => {
+    if (musicTimerRef.current) { clearInterval(musicTimerRef.current); musicTimerRef.current = null; }
+  };
+
+  useEffect(() => () => stopMusic(), []);
+
+  return { sounds, setEnabled, startMusic, stopMusic };
+}
+
+/* ---------------------------------- لعبة الأسئلة (دراسة / تدريس) ---------------------------------- */
+
+function QuizGame({ pool, rounds, payPerCorrect, sounds, onFinish }) {
+  const [qs] = useState(() => shuffleArray(pool).slice(0, rounds));
+  const [idx, setIdx] = useState(0);
+  const [feedback, setFeedback] = useState(null);
+  const [selected, setSelected] = useState(null);
+  const scoreRef = useRef(0);
+  const current = qs[idx];
+
+  const pick = (opt) => {
+    if (feedback) return;
+    const correct = opt === current.answer;
+    setSelected(opt);
+    setFeedback(correct ? "correct" : "wrong");
+    if (correct) { scoreRef.current += 1; sounds.chime(); } else { sounds.buzz(); }
+    setTimeout(() => {
+      if (idx + 1 < qs.length) { setIdx((i) => i + 1); setFeedback(null); setSelected(null); }
+      else onFinish(scoreRef.current * payPerCorrect, scoreRef.current, qs.length);
+    }, 800);
+  };
+
+  return (
+    <div className="space-y-3 text-center">
+      <p className="text-sm text-[#666]">سؤال {idx + 1} من {qs.length}</p>
+      <p className="font-bold text-[#2C3E50] text-lg leading-relaxed">{current.q}</p>
+      <div className="grid grid-cols-2 gap-2">
+        {current.options.map((opt) => {
+          let cls = "border-2 border-[#eee]";
+          if (feedback && opt === current.answer) cls = "border-2 border-green-500 bg-green-50";
+          else if (feedback && opt === selected) cls = "border-2 border-red-400 bg-red-50";
+          return (
+            <button key={opt} disabled={!!feedback} onClick={() => pick(opt)}
+              className={`py-2.5 rounded-xl font-semibold text-[#2C3E50] transition-all ${cls}`}>
+              {opt}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ---------------------------------- لعبة تقديم الطلبات (شغل بمطعم/كافيه) ---------------------------------- */
+
+function ServeGame({ items, rounds, timeLimit, sounds, onFinish }) {
+  const [seq] = useState(() => Array.from({ length: rounds }, () => items[Math.floor(Math.random() * items.length)]));
+  const [idx, setIdx] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(timeLimit);
+  const [feedback, setFeedback] = useState(null);
+  const [selected, setSelected] = useState(null);
+  const earnedRef = useRef(0);
+  const answeredRef = useRef(false);
+  const current = seq[idx];
+
+  const choices = useMemo(() => {
+    const others = items.filter((it) => it[0] !== current[0]).map((it) => it[0]);
+    const picks = shuffleArray(others).slice(0, Math.min(3, others.length));
+    return shuffleArray([current[0], ...picks]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idx]);
+
+  const handleAnswer = (opt) => {
+    if (answeredRef.current) return;
+    answeredRef.current = true;
+    const correct = opt === current[0];
+    setSelected(opt);
+    setFeedback(correct ? "correct" : "wrong");
+    if (correct) { earnedRef.current += current[1]; sounds.cash(); } else { sounds.buzz(); }
+    setTimeout(() => {
+      if (idx + 1 < seq.length) setIdx((i) => i + 1);
+      else onFinish(earnedRef.current, seq.length);
+    }, 700);
+  };
+
+  useEffect(() => {
+    answeredRef.current = false;
+    setTimeLeft(timeLimit);
+    setFeedback(null);
+    setSelected(null);
+    const timer = setInterval(() => {
+      setTimeLeft((t) => {
+        if (t <= 1) { clearInterval(timer); handleAnswer(null); return 0; }
+        return t - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idx]);
+
+  return (
+    <div className="space-y-3 text-center">
+      <p className="text-sm text-[#666]">طلب {idx + 1} من {seq.length}</p>
+      <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+        <div className="h-full bg-[#F4A261] transition-all" style={{ width: `${(timeLeft / timeLimit) * 100}%` }} />
+      </div>
+      <p className="font-bold text-[#2C3E50] text-lg">🧑‍🍳 الزبون يريد: {current[0]}</p>
+      <div className="grid grid-cols-2 gap-2">
+        {choices.map((opt) => {
+          let cls = "border-2 border-[#eee]";
+          if (feedback && opt === current[0]) cls = "border-2 border-green-500 bg-green-50";
+          else if (feedback && opt === selected) cls = "border-2 border-red-400 bg-red-50";
+          return (
+            <button key={opt} disabled={!!feedback} onClick={() => handleAnswer(opt)}
+              className={`py-2.5 rounded-xl font-semibold text-[#2C3E50] transition-all ${cls}`}>
+              {opt}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ---------------------------------- لعبة التوصيل (ديلفري) ---------------------------------- */
+
+const DELIVERY_SOURCES = ["مطعم", "كافيه", "سوبر ماركت"];
+
+function DeliveryGame({ rounds, timeLimit, sounds, onFinish }) {
+  const itemPool = {
+    "مطعم": SHOPS.restaurant.items.map((i) => i[0]),
+    "كافيه": SHOPS.cafe.items.map((i) => i[0]),
+    "سوبر ماركت": SHOPS.supermarket.items.map((i) => i[0]),
+  };
+  const [seq] = useState(() => Array.from({ length: rounds }, () => {
+    const source = DELIVERY_SOURCES[Math.floor(Math.random() * DELIVERY_SOURCES.length)];
+    const item = itemPool[source][Math.floor(Math.random() * itemPool[source].length)];
+    const houseNumber = 100 + Math.floor(Math.random() * 900);
+    return { source, item, houseNumber, basePay: 10 };
+  }));
+  const [idx, setIdx] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(timeLimit);
+  const [feedback, setFeedback] = useState(null);
+  const [lastPay, setLastPay] = useState(0);
+  const earnedRef = useRef(0);
+  const answeredRef = useRef(false);
+  const current = seq[idx];
+
+  const finishRound = (pay) => {
+    if (answeredRef.current) return;
+    answeredRef.current = true;
+    earnedRef.current += pay;
+    setLastPay(pay);
+    setFeedback(pay > 0 ? "done" : "missed");
+    if (pay > 0) sounds.cash(); else sounds.buzz();
+    setTimeout(() => {
+      if (idx + 1 < seq.length) setIdx((i) => i + 1);
+      else onFinish(earnedRef.current, seq.length);
+    }, 700);
+  };
+
+  const handleDeliver = () => {
+    const bonus = Math.round((timeLeft / timeLimit) * 20);
+    finishRound(current.basePay + bonus);
+  };
+
+  useEffect(() => {
+    answeredRef.current = false;
+    setTimeLeft(timeLimit);
+    setFeedback(null);
+    const timer = setInterval(() => {
+      setTimeLeft((t) => {
+        if (t <= 1) { clearInterval(timer); finishRound(0); return 0; }
+        return t - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idx]);
+
+  return (
+    <div className="space-y-3 text-center">
+      <p className="text-sm text-[#666]">توصيلة {idx + 1} من {seq.length}</p>
+      <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+        <div className="h-full bg-[#F4A261] transition-all" style={{ width: `${(timeLeft / timeLimit) * 100}%` }} />
+      </div>
+      <p className="font-bold text-[#2C3E50]">📦 طلب من {current.source}: {current.item}</p>
+      <p className="text-sm text-[#666]">وصّله لمنزل رقم <span className="font-bold text-[#2C3E50]">#{current.houseNumber}</span> بأسرع وقت لأعلى إكرامية</p>
+      {feedback ? (
+        <p className={`font-bold ${feedback === "done" ? "text-green-600" : "text-red-500"}`}>
+          {feedback === "done" ? `وصلت! ربحت ${lastPay}$ 🛵` : "طفشت الطلب 😅"}
+        </p>
+      ) : (
+        <button onClick={handleDeliver} className="w-full bg-[#2C3E50] text-white font-bold py-3 rounded-xl">
+          🛵 سلّم الطلب
+        </button>
+      )}
+    </div>
+  );
+}
+
+/* ---------------------------------- عنصر صف القائمة (بنفس أسلوب البنك) ---------------------------------- */
+
+function ListRow({ emoji, name, sub, onClick, isLast }) {
+  return (
+    <button onClick={onClick}
+      className={`w-full flex items-center justify-between px-4 py-3.5 text-right active:bg-[#F7F7F5] transition-colors ${!isLast ? "border-b border-[#F0F0F0]" : ""}`}>
+      <span className="flex items-center gap-3">
+        <span className="text-2xl">{emoji}</span>
+        <span className="text-right">
+          <span className="block font-semibold text-[#2C3E50]">{name}</span>
+          {sub && <span className="block text-xs text-[#999]">{sub}</span>}
+        </span>
+      </span>
+      <ChevronLeft size={18} className="text-[#ccc]" />
+    </button>
+  );
+}
+
+/* ---------------------------------- التطبيق الرئيسي ---------------------------------- */
+
+function LifeSimGame() {
+  const [stage, setStage] = useState("loading");
+  const [character, setCharacter] = useState({ name: "", age: 20, gender: "male", outfit: "casual" });
+  const [money, setMoney] = useState(800);
+  const [house, setHouse] = useState(null);
+  const [pool, setPool] = useState(false);
+  const [ownedClothes, setOwnedClothes] = useState(["casual"]);
+  const [inventory, setInventory] = useState({});
+  const [carriedItems, setCarriedItems] = useState({});
+  const [resources, setResources] = useState({ wood: 0, stone: 0, brick: 0 });
+  const [ownedVehicles, setOwnedVehicles] = useState([]);
+  const [activeVehicle, setActiveVehicle] = useState(null);
+  const [bankBalance, setBankBalance] = useState(0);
+  const [bankAmount, setBankAmount] = useState("");
+  const [modal, setModal] = useState(null);
+  const [estateFilter, setEstateFilter] = useState("all");
+  const [toast, setToast] = useState(null);
+  const [soundOn, setSoundOn] = useState(true);
+  const [musicOn, setMusicOn] = useState(false);
+  const [chatHistories, setChatHistories] = useState({ sara: [{ from: "npc", text: "أهلاً فيك! أنا سارة، جارتك 👋" }] });
+  const [chatInput, setChatInput] = useState("");
+
+  const { sounds, setEnabled, startMusic, stopMusic } = useSound();
+  const REQ = { wood: 20, stone: 15, brick: 10 };
+
+  /* ------------ تحميل/حفظ ------------ */
+  useEffect(() => {
+    (async () => {
+      try {
+        const raw = localStorage.getItem("life-sim-save-v3");
+        if (raw) {
+          const s = JSON.parse(raw);
+          setCharacter(s.character); setMoney(s.money); setHouse(s.house);
+          setPool(s.pool); setOwnedClothes(s.ownedClothes || ["casual"]);
+          setInventory(s.inventory || {}); setCarriedItems(s.carriedItems || {}); setResources(s.resources || { wood: 0, stone: 0, brick: 0 });
+          setOwnedVehicles(s.ownedVehicles || []); setActiveVehicle(s.activeVehicle || null);
+          setBankBalance(s.bankBalance || 0);
+          setChatHistories(s.chatHistories || { sara: [{ from: "npc", text: "أهلاً فيك! أنا سارة، جارتك 👋" }] });
+          setStage(s.house ? "world" : "create");
+        } else {
+          setStage("intro");
+        }
+      } catch (e) { setStage("intro"); }
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (stage !== "world" && stage !== "build" && stage !== "chooseHouse") return;
+    const t = setTimeout(() => {
+      const state = { character, money, house, pool, ownedClothes, inventory, carriedItems, resources, ownedVehicles, activeVehicle, chatHistories, bankBalance };
+      localStorage.setItem("life-sim-save-v3", JSON.stringify(state));
+    }, 400);
+    return () => clearTimeout(t);
+  }, [character, money, house, pool, ownedClothes, inventory, carriedItems, resources, ownedVehicles, activeVehicle, chatHistories, bankBalance, stage]);
+
+  useEffect(() => { setEnabled(soundOn); }, [soundOn]);
+  useEffect(() => { musicOn ? startMusic() : stopMusic(); }, [musicOn]);
+  useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 1900); return () => clearTimeout(t); } }, [toast]);
+
+  /* ------------ إجراءات عامة ------------ */
+
+  const buyHouse = (h) => {
+    if (money < h.price) { setToast("ما عندك فلوس كافية 😅"); return; }
+    setMoney((m) => m - h.price);
+    setHouse({ id: h.id, name: h.name, emoji: h.emoji, custom: false });
+    sounds.cash(); setStage("world"); setToast(`مبروك بيتك الجديد: ${h.name}!`);
+  };
+
+  const gather = (res) => { setResources((r) => ({ ...r, [res]: r[res] + 1 })); sounds.click(); };
+
+  const finishBuild = () => {
+    setHouse({ id: "custom", name: "منزل بنيته بنفسي", emoji: "🏗️🏠", custom: true });
+    sounds.chime(); setStage("world"); setToast("مبروك! بنيت بيتك بيدك 🎉");
+  };
+
+  const buyItem = (itemName, price) => {
+    if (money < price) { setToast("ما عندك فلوس كافية 😅"); return; }
+    setMoney((m) => m - price);
+    if (itemName.includes("مسبح")) setPool(true);
+    setCarriedItems((inv) => ({ ...inv, [itemName]: (inv[itemName] || 0) + 1 }));
+    sounds.cash(); setToast(`اشتريت: ${itemName} ✅ (بحقيبتك الآن)`);
+  };
+
+  const unpackBag = () => {
+    const carriedCount = Object.values(carriedItems).reduce((a, b) => a + b, 0);
+    if (carriedCount > 0) {
+      setInventory((inv) => {
+        const merged = { ...inv };
+        Object.entries(carriedItems).forEach(([k, v]) => { merged[k] = (merged[k] || 0) + v; });
+        return merged;
+      });
+      setCarriedItems({});
+      sounds.door();
+      setToast("رجعت البيت ورتبت أغراضك 🏠📦");
+    }
+  };
+
+  const discardItem = (name) => {
+    setInventory((inv) => {
+      const n = { ...inv };
+      if (n[name] > 1) n[name] -= 1; else delete n[name];
+      return n;
+    });
+    sounds.click();
+  };
+
+  const sellVehicle = (vid) => {
+    const v = ALL_VEHICLES.find((x) => x.id === vid);
+    if (!v) return;
+    const refund = Math.round(v.price * 0.5);
+    setMoney((m) => m + refund);
+    setOwnedVehicles((ov) => ov.filter((id) => id !== vid));
+    if (activeVehicle === vid) setActiveVehicle(null);
+    sounds.cash(); setToast(`بعت ${v.name} مقابل ${refund}$`);
+  };
+
+  const acceptHouseOffer = (price) => {
+    setMoney((m) => m + price);
+    setHouse(null); setPool(false);
+    setModal(null);
+    sounds.cash(); setToast(`بعت بيتك مقابل ${price}$ 🎉`);
+  };
+
+  const buyHouseFromMarket = (h) => {
+    if (house) { setToast("عندك بيت الحين! بيعه أول من قسم المنزل 🏠"); return; }
+    if (money < h.price) { setToast("ما عندك فلوس كافية 😅"); return; }
+    setMoney((m) => m - h.price);
+    setHouse({ id: h.id, name: h.name, emoji: h.emoji, custom: false });
+    sounds.cash(); setModal(null); setToast(`مبروك بيتك الجديد: ${h.name}!`);
+  };
+
+  const buyClothes = (c) => {
+    if (ownedClothes.includes(c.id)) { setCharacter((ch) => ({ ...ch, outfit: c.id })); return; }
+    if (money < c.price) { setToast("ما عندك فلوس كافية 😅"); return; }
+    setMoney((m) => m - c.price);
+    setOwnedClothes((o) => [...o, c.id]);
+    setCharacter((ch) => ({ ...ch, outfit: c.id }));
+    sounds.cash(); setToast(`لبست: ${c.name} 👗`);
+  };
+
+  const buyVehicle = (v) => {
+    if (money < v.price) { setToast("ما عندك فلوس كافية 😅"); return; }
+    setMoney((m) => m - v.price);
+    setOwnedVehicles((ov) => [...ov, v.id]);
+    setActiveVehicle(v.id);
+    sounds.cash(); setToast(`اشتريت ${v.name} 🎉`);
+  };
+
+  const doRide = (label) => { sounds.ride(); setToast(`${label}... استمتعت بالرحلة! 🛣️`); };
+  const swim = () => { sounds.splash(); setToast("سباحة منعشة! 🏊"); };
+
+  const deposit = () => {
+    const amt = parseInt(bankAmount, 10) || 0;
+    if (amt <= 0) return;
+    if (amt > money) { setToast("ما عندك هالمبلغ نقدي معك 😅"); return; }
+    setMoney((m) => m - amt); setBankBalance((b) => b + amt); setBankAmount("");
+    sounds.cash(); setToast(`أودعت ${amt}$ بالبنك`);
+  };
+  const withdraw = () => {
+    const amt = parseInt(bankAmount, 10) || 0;
+    if (amt <= 0) return;
+    if (amt > bankBalance) { setToast("رصيدك بالبنك ما يكفي 😅"); return; }
+    setBankBalance((b) => b - amt); setMoney((m) => m + amt); setBankAmount("");
+    sounds.cash(); setToast(`سحبت ${amt}$ من البنك`);
+  };
+
+  const sendChat = (botId) => {
+    if (!chatInput.trim()) return;
+    const msg = chatInput.trim();
+    setChatHistories((ch) => ({ ...ch, [botId]: [...(ch[botId] || []), { from: "me", text: msg }] }));
+    setChatInput("");
+    sounds.click();
+    setTimeout(() => {
+      const reply = NPC_LINES[Math.floor(Math.random() * NPC_LINES.length)];
+      setChatHistories((ch) => ({ ...ch, [botId]: [...(ch[botId] || []), { from: "npc", text: reply }] }));
+    }, 700 + Math.random() * 600);
+  };
+
+  const resetGame = async () => {
+    try { localStorage.removeItem("life-sim-save-v3"); } catch (e) {}
+    window.location.reload();
+  };
+
+  const topAvatar = () => {
+    const v = ALL_VEHICLES.find((x) => x.id === activeVehicle);
+    return v ? v.emoji : avatarEmoji(character.gender, character.age);
+  };
+
+  /* ---------------------------------- الواجهات ---------------------------------- */
+
+  if (stage === "loading") return <Shell><div className="text-white text-lg animate-pulse">جارِ التحميل...</div></Shell>;
+
+  if (stage === "intro") {
+    return (
+      <Shell>
+        <div className="text-center max-w-md mx-auto px-6">
+          <div className="text-7xl mb-4">🏡✨</div>
+          <h1 className="text-3xl font-extrabold text-white mb-2 tracking-tight">حياتي الافتراضية</h1>
+          <p className="text-white/80 mb-8 leading-relaxed">اختر شخصيتك، ابنِ أو اشترِ بيت أحلامك، واختر من قائمة الأماكن اللي تبي تروحها — كل شي بضغطة وحدة 👆</p>
+          <button onClick={() => { setStage("create"); sounds.click(); }}
+            className="bg-[#F4A261] hover:bg-[#e8925a] active:scale-95 transition-all text-[#2C3E50] font-bold text-lg px-10 py-3 rounded-full shadow-lg shadow-black/20">
+            ابدأ اللعب
+          </button>
+        </div>
+      </Shell>
+    );
+  }
+
+  if (stage === "create") {
+    return (
+      <Shell>
+        <div className="w-full max-w-md mx-auto px-5">
+          <h2 className="text-2xl font-bold text-white mb-5 text-center">أنشئ شخصيتك</h2>
+          <div className="bg-white/95 rounded-3xl p-5 shadow-xl space-y-5">
+            <div className="text-center text-6xl">{avatarEmoji(character.gender, character.age)}</div>
+            <div>
+              <label className="text-sm font-semibold text-[#2C3E50]">الاسم</label>
+              <input value={character.name} onChange={(e) => setCharacter({ ...character, name: e.target.value })}
+                placeholder="اكتب اسمك..." maxLength={20}
+                className="w-full mt-1 border-2 border-[#eee] rounded-xl px-3 py-2 outline-none focus:border-[#F4A261]" />
+            </div>
+            <div>
+              <label className="text-sm font-semibold text-[#2C3E50]">العمر: {character.age}</label>
+              <input type="range" min="5" max="75" value={character.age}
+                onChange={(e) => setCharacter({ ...character, age: parseInt(e.target.value) })}
+                className="w-full accent-[#F4A261]" />
+              <p className="text-xs text-[#666] mt-0.5">الفئة: {{ child: "طفل", teen: "مراهق", adult: "بالغ", elder: "كبير سن" }[ageCategory(character.age)]}</p>
+            </div>
+            <div>
+              <label className="text-sm font-semibold text-[#2C3E50] block mb-1">الجنس</label>
+              <div className="flex gap-2">
+                {[["male", "ذكر"], ["female", "أنثى"]].map(([id, label]) => (
+                  <button key={id} onClick={() => setCharacter({ ...character, gender: id })}
+                    className={`flex-1 py-2 rounded-xl font-semibold border-2 transition-all ${character.gender === id ? "bg-[#7FB3D5] border-[#7FB3D5] text-white" : "border-[#eee] text-[#2C3E50]"}`}>
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-semibold text-[#2C3E50] block mb-1">أسلوب الملابس</label>
+              <div className="flex gap-2 flex-wrap">
+                {CLOTHES.map((c) => (
+                  <button key={c.id} onClick={() => setCharacter({ ...character, outfit: c.id })}
+                    className={`px-3 py-2 rounded-xl border-2 text-sm font-medium ${character.outfit === c.id ? "bg-[#F4A261] border-[#F4A261] text-white" : "border-[#eee] text-[#2C3E50]"}`}>
+                    {c.emoji} {c.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <button disabled={!character.name.trim()} onClick={() => { setStage("path"); sounds.click(); }}
+              className="w-full bg-[#2C3E50] disabled:opacity-40 text-white font-bold py-3 rounded-xl">
+              التالي
+            </button>
+          </div>
+        </div>
+      </Shell>
+    );
+  }
+
+  if (stage === "path") {
+    return (
+      <Shell>
+        <div className="w-full max-w-md mx-auto px-5 text-center">
+          <h2 className="text-2xl font-bold text-white mb-2">اختر طريقك يا {character.name}</h2>
+          <p className="text-white/80 mb-6">رصيدك الحالي: {money}$ 💰</p>
+          <div className="space-y-3">
+            <button onClick={() => { setStage("chooseHouse"); sounds.click(); }}
+              className="w-full bg-white rounded-2xl p-5 shadow-lg text-right flex items-center gap-4 active:scale-95 transition-all">
+              <span className="text-4xl">🏘️</span>
+              <span>
+                <span className="block font-bold text-[#2C3E50]">شراء بيت جاهز</span>
+                <span className="block text-sm text-[#666]">اختر من بيوت فخمة، متوسطة، أو بسيطة</span>
+              </span>
+            </button>
+            <button onClick={() => { setStage("build"); sounds.click(); }}
+              className="w-full bg-white rounded-2xl p-5 shadow-lg text-right flex items-center gap-4 active:scale-95 transition-all">
+              <span className="text-4xl">🔨</span>
+              <span>
+                <span className="block font-bold text-[#2C3E50]">ابنِ بيتك بنفسك</span>
+                <span className="block text-sm text-[#666]">اجمع الخشب والحجارة والطوب وابنِ منزلك</span>
+              </span>
+            </button>
+          </div>
+        </div>
+      </Shell>
+    );
+  }
+
+  if (stage === "chooseHouse") {
+    return (
+      <Shell>
+        <div className="w-full max-w-md mx-auto px-5">
+          <h2 className="text-xl font-bold text-white mb-1 text-center">اختر بيتك</h2>
+          <p className="text-white/80 mb-4 text-center">رصيدك: {money}$ 💰</p>
+          <div className="grid grid-cols-2 gap-3">
+            {HOUSES.map((h) => (
+              <button key={h.id} onClick={() => buyHouse(h)}
+                className="bg-white rounded-2xl p-4 shadow-lg active:scale-95 transition-all text-center">
+                <div className="text-4xl mb-1">{h.emoji}</div>
+                <div className="font-bold text-[#2C3E50] text-sm">{h.name}</div>
+                <div className="text-xs text-[#666] mb-1">{h.desc}</div>
+                <div className={`text-sm font-bold ${money >= h.price ? "text-green-600" : "text-red-500"}`}>{h.price}$</div>
+              </button>
+            ))}
+          </div>
+          <button onClick={() => setStage("path")} className="mt-4 w-full text-white/80 underline text-sm">رجوع</button>
+        </div>
+      </Shell>
+    );
+  }
+
+  if (stage === "build") {
+    const done = resources.wood >= REQ.wood && resources.stone >= REQ.stone && resources.brick >= REQ.brick;
+    const bars = [["wood", "🪵 خشب", "#B5651D"], ["stone", "🪨 حجارة", "#7d7d7d"], ["brick", "🧱 طوب", "#B33A3A"]];
+    return (
+      <Shell>
+        <div className="w-full max-w-md mx-auto px-5">
+          <h2 className="text-xl font-bold text-white mb-4 text-center">اجمع مواد البناء</h2>
+          <div className="bg-white rounded-2xl p-5 shadow-lg space-y-4">
+            {bars.map(([key, label, color]) => (
+              <div key={key}>
+                <div className="flex justify-between text-sm font-semibold text-[#2C3E50] mb-1">
+                  <span>{label}</span><span>{resources[key]} / {REQ[key]}</span>
+                </div>
+                <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden mb-2">
+                  <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(100, (resources[key] / REQ[key]) * 100)}%`, background: color }} />
+                </div>
+                <button onClick={() => gather(key)} className="w-full py-2 rounded-xl border-2 font-semibold text-[#2C3E50] active:scale-95 transition-all" style={{ borderColor: color }}>
+                  اجمع {label}
+                </button>
+              </div>
+            ))}
+            <button disabled={!done} onClick={finishBuild}
+              className="w-full bg-[#F4A261] disabled:opacity-40 text-[#2C3E50] font-bold py-3 rounded-xl flex items-center justify-center gap-2">
+              <Hammer size={18} /> ابنِ المنزل
+            </button>
+          </div>
+          <button onClick={() => setStage("path")} className="mt-4 w-full text-white/80 underline text-sm">رجوع</button>
+        </div>
+      </Shell>
+    );
+  }
+
+  /* ------------ الواجهة الرئيسية: قائمة الأماكن ------------ */
+
+  const schoolAction = () => setModal({ type: "schoolChoice" });
+
+  const CATEGORIES = [
+    {
+      title: "منزلي",
+      items: [
+        { id: "home", name: house ? house.name : "المنزل", sub: house ? undefined : "لسه ما بنيت بيت", emoji: house ? house.emoji : "🏠", action: () => { unpackBag(); setModal({ type: "home" }); } },
+        { id: "realestate", name: "السوق العقاري", sub: "تصفح البيوت واشترِ حسب مواصفاتك", emoji: "🏘️", action: () => setModal({ type: "realEstate" }) },
+        { id: "bank", name: "البنك", sub: `رصيدك: ${bankBalance}$`, emoji: "🏦", action: () => setModal({ type: "bank" }) },
+      ],
+    },
+    {
+      title: "الأسواق",
+      items: [
+        { id: "veggies", name: SHOPS.veggies.name, emoji: SHOPS.veggies.emoji, action: () => setModal({ type: "shop", key: "veggies" }) },
+        { id: "fruits", name: SHOPS.fruits.name, emoji: SHOPS.fruits.emoji, action: () => setModal({ type: "shop", key: "fruits" }) },
+        { id: "sweets", name: SHOPS.sweets.name, emoji: SHOPS.sweets.emoji, action: () => setModal({ type: "shop", key: "sweets" }) },
+        { id: "meat", name: SHOPS.meat.name, emoji: SHOPS.meat.emoji, action: () => setModal({ type: "shop", key: "meat" }) },
+        { id: "fish", name: SHOPS.fish.name, emoji: SHOPS.fish.emoji, action: () => setModal({ type: "shop", key: "fish" }) },
+        { id: "homegoods", name: SHOPS.home.name, emoji: SHOPS.home.emoji, action: () => setModal({ type: "shop", key: "home" }) },
+        { id: "supermarket", name: SHOPS.supermarket.name, sub: "اطلب أو اشتغل كاشير", emoji: SHOPS.supermarket.emoji, action: () => setModal({ type: "shop", key: "supermarket" }) },
+      ],
+    },
+    {
+      title: "المول",
+      items: [
+        { id: "phones", name: SHOPS.phones.name, emoji: SHOPS.phones.emoji, action: () => setModal({ type: "shop", key: "phones" }) },
+        { id: "perfumes", name: SHOPS.perfumes.name, emoji: SHOPS.perfumes.emoji, action: () => setModal({ type: "shop", key: "perfumes" }) },
+        { id: "mallclothes", name: SHOPS.mallclothes.name, emoji: SHOPS.mallclothes.emoji, action: () => setModal({ type: "shop", key: "mallclothes" }) },
+      ],
+    },
+    {
+      title: "خدمات عامة",
+      items: [
+        { id: "hospital", name: "المستشفى", sub: "اعمل ممرض/طبيب", emoji: "🏥", action: () => setModal({ type: "quiz", pool: HOSPITAL_QUESTIONS, rounds: 3, payPerCorrect: 25, title: "العمل بالمستشفى" }) },
+        { id: "police", name: "قسم الشرطة", sub: "اعمل شرطي", emoji: "🚓", action: () => setModal({ type: "quiz", pool: POLICE_QUESTIONS, rounds: 3, payPerCorrect: 25, title: "العمل بالشرطة" }) },
+        { id: "firestation", name: "الإطفائية", sub: "اعمل رجل إطفاء", emoji: "🚒", action: () => setModal({ type: "quiz", pool: FIRE_QUESTIONS, rounds: 3, payPerCorrect: 25, title: "العمل بالإطفاء" }) },
+      ],
+    },
+    {
+      title: "مطاعم ومقاهي",
+      items: [
+        { id: "cafe", name: "كافيه", sub: "اطلب أو اشتغل", emoji: "☕", action: () => setModal({ type: "shop", key: "cafe" }) },
+        { id: "restaurant", name: "مطعم", sub: "اطلب أو اشتغل", emoji: "🍽️", action: () => setModal({ type: "shop", key: "restaurant" }) },
+      ],
+    },
+    {
+      title: "التعليم والعمل",
+      items: [
+        { id: "school", name: "المدرسة", sub: "ادرس كطالب أو اعمل كمعلّم", emoji: "🏫", action: schoolAction },
+        { id: "university", name: "الجامعة (اعمل)", emoji: "🎓", action: () => setModal({ type: "quiz", pool: QUIZ_QUESTIONS, rounds: 4, payPerCorrect: 35, title: "العمل بالجامعة" }) },
+        { id: "delivery", name: "ديلفري", sub: ownedVehicles.length > 0 ? "وصّل طلبات لأرقام البيوت" : "تحتاج مركبة أول (إسطبل / معرض سيارات)", emoji: "🛵", action: () => {
+            if (ownedVehicles.length === 0) { setToast("تحتاج مركبة عشان تشتغل ديلفري 🛵 جرّب الإسطبل أو معرض السيارات"); return; }
+            setModal({ type: "delivery" });
+          } },
+      ],
+    },
+    {
+      title: "ترفيه وطبيعة",
+      items: [
+        { id: "beach", name: "الشاطئ", sub: "سباحة", emoji: "🏖️", action: swim },
+        { id: "farm", name: "المزرعة", emoji: "🌾", action: () => { sounds.click(); setToast("جمعت خضار طازجة من المزرعة 🌾"); } },
+        { id: "mountain", name: "الجبل", emoji: "⛰️", action: () => { sounds.click(); setToast("إطلالة رائعة من الأعلى ⛰️"); } },
+        { id: "park", name: "الملاهي", emoji: "🎡", action: () => { sounds.chime(); setToast("استمتعت بالملاهي 🎡"); } },
+      ],
+    },
+    {
+      title: "المواصلات",
+      items: [
+        { id: "stable", name: "الإسطبل", sub: "شراء حصان", emoji: "🐴", action: () => setModal({ type: "vehicle", key: "stable" }) },
+        { id: "car", name: "معرض السيارات", sub: "سكوتر / سيارة", emoji: "🚗", action: () => setModal({ type: "vehicle", key: "car" }) },
+        { id: "bus", name: "موقف الباص", sub: "باص شخصي", emoji: "🚌", action: () => setModal({ type: "vehicle", key: "bus" }) },
+        { id: "airport", name: "المطار", sub: "رحلة طيران", emoji: "✈️", action: () => doRide("رحلة طيران") },
+      ],
+    },
+    {
+      title: "الأصدقاء",
+      items: FRIENDS.map((f) => ({ id: f.id, name: f.name, emoji: f.emoji, action: () => setModal({ type: "chat", botId: f.id, botName: f.name }) })),
+    },
+  ];
+
+  return (
+    <div dir="rtl" className="w-full min-h-screen bg-gradient-to-b from-[#EAF4FB] to-[#F7F9FC] font-sans">
+      <div className="sticky top-0 z-30 bg-gradient-to-b from-[#7FB3D5] to-[#7FB3D5]/95 backdrop-blur px-3 py-3 shadow-md">
+        <div className="w-full max-w-md mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-2 bg-white/90 rounded-full px-3 py-1.5 shadow">
+            <span className="text-xl">{topAvatar()}</span>
+            <span className="font-bold text-[#2C3E50] text-sm">{character.name}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 bg-white/90 rounded-full px-3 py-1.5 shadow font-bold text-[#2C3E50] text-sm">
+              <Wallet size={16} /> {money}$
+            </div>
+            {Object.keys(carriedItems).length > 0 && (
+              <div className="flex items-center gap-1 bg-[#F4A261] text-white rounded-full px-3 py-1.5 shadow font-bold text-sm">
+                🎒 {Object.values(carriedItems).reduce((a, b) => a + b, 0)}
+              </div>
+            )}
+            <button onClick={() => setSoundOn((s) => !s)} className="bg-white/90 rounded-full p-2 shadow">
+              {soundOn ? <Volume2 size={16} /> : <VolumeX size={16} />}
+            </button>
+            <button onClick={() => setMusicOn((m) => !m)} className={`rounded-full p-2 shadow ${musicOn ? "bg-[#F4A261] text-white" : "bg-white/90"}`}>
+              <Sparkles size={16} />
+            </button>
+            <button onClick={resetGame} className="bg-white/90 rounded-full p-2 shadow" title="إعادة اللعبة">
+              <RotateCcw size={16} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="w-full max-w-md mx-auto px-4 pt-4 pb-8">
+        {CATEGORIES.map((cat) => (
+          <div key={cat.title} className="mb-5">
+            <p className="text-xs font-bold text-[#7FB3D5] mb-1.5 px-1">{cat.title}</p>
+            <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
+              {cat.items.map((it, i) => (
+                <ListRow key={it.id} emoji={it.emoji} name={it.name} sub={it.sub} onClick={it.action} isLast={i === cat.items.length - 1} />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {toast && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 bg-[#2C3E50] text-white px-4 py-2 rounded-full shadow-lg text-sm z-50 whitespace-nowrap">
+          {toast}
+        </div>
+      )}
+
+      {modal && (
+        <div className="fixed inset-0 bg-black/40 flex items-end sm:items-center justify-center z-40 p-3" onClick={() => setModal(null)}>
+          <div onClick={(e) => e.stopPropagation()} className="bg-white rounded-3xl w-full max-w-sm p-5 max-h-[80vh] overflow-y-auto shadow-2xl">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="font-bold text-lg text-[#2C3E50]">
+                {modal.type === "home" && "منزلي"}
+                {modal.type === "shop" && SHOPS[modal.key].name}
+                {modal.type === "quiz" && modal.title}
+                {modal.type === "serve" && `العمل: ${modal.shopName}`}
+                {modal.type === "vehicle" && "المركبات"}
+                {modal.type === "bank" && "البنك 🏦"}
+                {modal.type === "realEstate" && "السوق العقاري 🏘️"}
+                {modal.type === "delivery" && "شغل الديلفري 🛵"}
+                {modal.type === "schoolChoice" && "المدرسة 🏫"}
+                {modal.type === "sellHouse" && "بيع المنزل 🏷️"}
+                {modal.type === "chat" && `محادثة مع ${modal.botName} 💬`}
+              </h3>
+              <button onClick={() => setModal(null)}><X size={20} /></button>
+            </div>
+
+            {modal.type === "home" && (
+              <div className="space-y-3 text-center">
+                {house ? (
+                  <>
+                    <div className="text-6xl">{house.emoji}</div>
+                    <p className="font-semibold text-[#2C3E50]">{house.name}</p>
+                    {pool && <p className="text-sm text-[#468FAF]">🏊 يوجد مسبح في الحديقة</p>}
+                    <button onClick={() => swim()} disabled={!pool}
+                      className="w-full bg-[#7FB3D5] disabled:opacity-40 text-white font-bold py-2 rounded-xl">اسبح في المسبح</button>
+                    <button onClick={() => setModal({ type: "sellHouse" })}
+                      className="w-full border-2 border-red-300 text-red-500 font-bold py-2 rounded-xl">بيع المنزل 🏷️</button>
+                  </>
+                ) : (
+                  <p className="text-[#666] text-sm">ما عندك بيت بعد.</p>
+                )}
+
+                {Object.keys(inventory).length > 0 && (
+                  <>
+                    <p className="text-sm font-semibold text-[#2C3E50] pt-2">أغراضي بالبيت (رتّبها)</p>
+                    <div className="space-y-1.5">
+                      {Object.entries(inventory).map(([name, qty]) => (
+                        <div key={name} className="flex justify-between items-center bg-[#F7F7F5] rounded-xl px-3 py-2">
+                          <span className="text-sm font-medium text-[#2C3E50]">{name} (x{qty})</span>
+                          <button onClick={() => discardItem(name)} className="text-lg">🗑️</button>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                <p className="text-sm font-semibold text-[#2C3E50] pt-2">خزانة الملابس</p>
+                <div className="flex gap-2 flex-wrap justify-center">
+                  {CLOTHES.map((c) => (
+                    <button key={c.id} onClick={() => buyClothes(c)}
+                      className={`px-3 py-2 rounded-xl border-2 text-sm font-medium ${character.outfit === c.id ? "bg-[#F4A261] border-[#F4A261] text-white" : "border-[#eee] text-[#2C3E50]"}`}>
+                      {c.emoji} {c.name}{!ownedClothes.includes(c.id) ? ` (${c.price}$)` : ""}
+                    </button>
+                  ))}
+                </div>
+                {ownedVehicles.length > 0 && (
+                  <>
+                    <p className="text-sm font-semibold text-[#2C3E50] pt-2">مركباتي</p>
+                    <div className="space-y-1.5">
+                      {ownedVehicles.map((vid) => {
+                        const v = ALL_VEHICLES.find((x) => x.id === vid);
+                        const active = activeVehicle === vid;
+                        return (
+                          <div key={vid} className="flex justify-between items-center bg-[#F7F7F5] rounded-xl px-3 py-2">
+                            <button onClick={() => setActiveVehicle(vid)}
+                              className={`px-3 py-1.5 rounded-lg text-sm font-medium ${active ? "bg-[#2C3E50] text-white" : "border-2 border-[#eee] text-[#2C3E50]"}`}>
+                              {v.emoji} {v.name}
+                            </button>
+                            <button onClick={() => sellVehicle(vid)} className="text-xs font-bold text-red-500 px-2">بيع (${Math.round(v.price * 0.5)})</button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+
+            {modal.type === "schoolChoice" && (
+              <div className="space-y-2">
+                <button onClick={() => setModal({ type: "quiz", pool: QUIZ_QUESTIONS, rounds: 3, payPerCorrect: 15, title: "واجب المدرسة" })}
+                  className="w-full flex items-center gap-3 bg-[#F7F7F5] rounded-xl px-4 py-3 text-right">
+                  <span className="text-2xl">📚</span><span className="font-semibold text-[#2C3E50]">ادرس كطالب</span>
+                </button>
+                <button onClick={() => setModal({ type: "quiz", pool: QUIZ_QUESTIONS, rounds: 4, payPerCorrect: 25, title: "التدريس بالمدرسة" })}
+                  className="w-full flex items-center gap-3 bg-[#F7F7F5] rounded-xl px-4 py-3 text-right">
+                  <span className="text-2xl">🍎</span><span className="font-semibold text-[#2C3E50]">اعمل كمعلّم</span>
+                </button>
+              </div>
+            )}
+
+            {modal.type === "sellHouse" && house && (() => {
+              const basePrice = HOUSES.find((h) => h.id === house.id)?.price || 2000;
+              const offers = shuffleArray(BUYER_NAMES).slice(0, 3).map((name) => ({
+                name, price: Math.round(basePrice * (0.7 + Math.random() * 0.6)),
+              }));
+              return (
+                <div className="space-y-2">
+                  <p className="text-sm text-[#666] text-center mb-1">عروض المشترين على {house.name}</p>
+                  {offers.map((o, i) => (
+                    <button key={i} onClick={() => acceptHouseOffer(o.price)}
+                      className="w-full flex justify-between items-center bg-[#F7F7F5] rounded-xl px-4 py-3">
+                      <span className="font-medium text-[#2C3E50]">{o.name}</span>
+                      <span className="font-bold text-green-700">{o.price}$</span>
+                    </button>
+                  ))}
+                </div>
+              );
+            })()}
+
+            {modal.type === "shop" && (
+              <div className="space-y-2">
+                {SHOPS[modal.key].items.map(([name, price]) => (
+                  <button key={name} onClick={() => buyItem(name, price)}
+                    className="w-full flex justify-between items-center bg-[#F7F7F5] hover:bg-[#F0F0EC] rounded-xl px-4 py-2.5">
+                    <span className="font-medium text-[#2C3E50]">{name} {inventory[name] ? `(x${inventory[name]})` : ""}</span>
+                    <span className="font-bold text-green-700">{price}$</span>
+                  </button>
+                ))}
+                {["cafe", "restaurant", "supermarket"].includes(modal.key) && (
+                  <button onClick={() => setModal({ type: "serve", key: modal.key, shopName: SHOPS[modal.key].name })}
+                    className="w-full bg-[#2C3E50] text-white font-bold py-2.5 rounded-xl mt-2">
+                    اعمل هنا وقدّم الطلبات 🧑‍🍳
+                  </button>
+                )}
+              </div>
+            )}
+
+            {modal.type === "quiz" && (
+              <QuizGame pool={modal.pool} rounds={modal.rounds} payPerCorrect={modal.payPerCorrect} sounds={sounds}
+                onFinish={(earned, correct, total) => {
+                  setMoney((m) => m + earned);
+                  setToast(`أحسنت! أجبت ${correct}/${total} صح، ربحت ${earned}$`);
+                  setTimeout(() => setModal(null), 300);
+                }} />
+            )}
+
+            {modal.type === "serve" && (
+              <ServeGame items={SHOPS[modal.key].items} rounds={5} timeLimit={6} sounds={sounds}
+                onFinish={(earned, total) => {
+                  setMoney((m) => m + earned);
+                  setToast(`خلصت الدوام! قدمت ${total} طلبات وربحت ${earned}$`);
+                  setTimeout(() => setModal(null), 300);
+                }} />
+            )}
+
+            {modal.type === "vehicle" && (
+              <div className="space-y-2">
+                {VEHICLES_BY_ZONE[modal.key].map((v) => {
+                  const owned = ownedVehicles.includes(v.id);
+                  const active = activeVehicle === v.id;
+                  return (
+                    <div key={v.id} className="flex justify-between items-center bg-[#F7F7F5] rounded-xl px-4 py-2.5">
+                      <span className="font-medium text-[#2C3E50]">{v.emoji} {v.name}</span>
+                      {owned ? (
+                        <button onClick={() => { setActiveVehicle(v.id); setToast(`تستخدم الآن: ${v.name}`); }}
+                          className={`px-3 py-1.5 rounded-lg font-bold text-sm ${active ? "bg-[#2C3E50] text-white" : "bg-white border-2 border-[#2C3E50] text-[#2C3E50]"}`}>
+                          {active ? "مستخدَم" : "استخدم"}
+                        </button>
+                      ) : (
+                        <button onClick={() => buyVehicle(v)} className="px-3 py-1.5 rounded-lg font-bold text-sm bg-[#F4A261] text-white">{v.price}$</button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {modal.type === "realEstate" && (
+              <div className="space-y-3">
+                <p className="text-sm text-[#666] text-center">رصيدك: {money}$ 💰</p>
+                <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+                  {ESTATE_FILTERS.map((f) => (
+                    <button key={f.id} onClick={() => setEstateFilter(f.id)}
+                      className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap ${estateFilter === f.id ? "bg-[#2C3E50] text-white" : "bg-[#F7F7F5] text-[#2C3E50]"}`}>
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+                <div className="space-y-2">
+                  {HOUSES.filter(ESTATE_FILTERS.find((f) => f.id === estateFilter).test).map((h) => (
+                    <div key={h.id} className="bg-[#F7F7F5] rounded-2xl p-3">
+                      <div className="flex items-center gap-3">
+                        <span className="text-3xl">{h.emoji}</span>
+                        <div className="flex-1">
+                          <p className="font-bold text-[#2C3E50] text-sm">{h.name}</p>
+                          <p className="text-xs text-[#777]">{h.desc}</p>
+                          <p className="text-xs text-[#999] mt-0.5">🛏️ {h.bedrooms} غرف · 📐 {h.area} م²{h.features.length > 0 ? ` · ${h.features.join("، ")}` : ""}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between mt-2">
+                        <span className={`font-bold text-sm ${money >= h.price ? "text-green-600" : "text-red-500"}`}>{h.price}$</span>
+                        <button onClick={() => buyHouseFromMarket(h)}
+                          className="bg-[#F4A261] text-white text-sm font-bold px-4 py-1.5 rounded-lg">اشترِ</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {modal.type === "delivery" && (
+              <DeliveryGame rounds={5} timeLimit={8} sounds={sounds}
+                onFinish={(earned, total) => {
+                  setMoney((m) => m + earned);
+                  setToast(`خلصت الديلفري! وصّلت ${total} طلبات وربحت ${earned}$`);
+                  setTimeout(() => setModal(null), 300);
+                }} />
+            )}
+
+            {modal.type === "bank" && (
+              <div className="space-y-4 text-center">
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="bg-[#F7F7F5] rounded-xl p-3">
+                    <p className="text-xs text-[#666]">النقود معك</p>
+                    <p className="font-bold text-lg text-[#2C3E50]">{money}$</p>
+                  </div>
+                  <div className="bg-[#F7F7F5] rounded-xl p-3">
+                    <p className="text-xs text-[#666]">رصيدك بالبنك</p>
+                    <p className="font-bold text-lg text-[#2A9D8F]">{bankBalance}$</p>
+                  </div>
+                </div>
+                <input type="number" inputMode="numeric" value={bankAmount} onChange={(e) => setBankAmount(e.target.value)}
+                  placeholder="اكتب المبلغ..." className="w-full border-2 border-[#eee] rounded-xl px-3 py-2 outline-none focus:border-[#F4A261] text-center" />
+                <div className="flex gap-2">
+                  <button onClick={deposit} className="flex-1 bg-[#2A9D8F] text-white font-bold py-2.5 rounded-xl">إيداع بالبنك</button>
+                  <button onClick={withdraw} className="flex-1 bg-[#F4A261] text-[#2C3E50] font-bold py-2.5 rounded-xl">سحب نقود</button>
+                </div>
+              </div>
+            )}
+
+            {modal.type === "chat" && (
+              <div>
+                <div className="h-56 overflow-y-auto space-y-2 mb-3 bg-[#F7F7F5] rounded-xl p-3">
+                  {(chatHistories[modal.botId] || []).map((m, i) => (
+                    <div key={i} className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm ${m.from === "me" ? "bg-[#F4A261] text-white mr-auto" : "bg-white ml-auto shadow"}`}>
+                      {m.text}
+                    </div>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <input value={chatInput} onChange={(e) => setChatInput(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && sendChat(modal.botId)}
+                    placeholder="اكتب رسالة..." className="flex-1 border-2 border-[#eee] rounded-xl px-3 py-2 outline-none focus:border-[#F4A261]" />
+                  <button onClick={() => sendChat(modal.botId)} className="bg-[#2C3E50] text-white px-4 rounded-xl font-bold">إرسال</button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Shell({ children }) {
+  return (
+    <div dir="rtl" className="w-full min-h-screen bg-gradient-to-b from-[#5AA9E6] to-[#7FB3D5] flex items-center justify-center py-10 font-sans">
+      {children}
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<LifeSimGame />);
+</script>
+</body>
+</html>
