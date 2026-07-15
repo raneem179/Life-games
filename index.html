@@ -46,6 +46,11 @@ const HOUSES = [
   { id: "beach", name: "بيت على البحر", price: 4000, emoji: "🏖️", desc: "إطلالة ساحرة على الموج", bedrooms: 4, area: 220, features: ["إطلالة بحر", "مسبح"] },
   { id: "luxury", name: "فيلا فاخرة", price: 5000, emoji: "🏰", desc: "رفاهية بلا حدود", bedrooms: 6, area: 400, features: ["مسبح", "حديقة", "إطلالة"] },
   { id: "palace", name: "قصر ملكي", price: 12000, emoji: "🏯", desc: "قمة الفخامة والرفاهية", bedrooms: 10, area: 900, features: ["مسبح", "حديقة", "إطلالة", "مصعد خاص"] },
+  { id: "townhouse", name: "تاون هاوس", price: 2900, emoji: "🏘️", desc: "بيت عائلي بحي هادئ ومتكامل", bedrooms: 4, area: 200, features: ["حديقة صغيرة"] },
+  { id: "studio", name: "استوديو", price: 500, emoji: "🏬", desc: "وحدة سكنية مستقلة وعملية", bedrooms: 1, area: 45, features: [] },
+  { id: "lakehouse", name: "بيت على البحيرة", price: 4600, emoji: "🏞️", desc: "هدوء المياه الساكنة والطبيعة", bedrooms: 3, area: 210, features: ["إطلالة بحيرة", "حديقة"] },
+  { id: "skyloft", name: "لوفت علوي فاخر", price: 6200, emoji: "🌆", desc: "إطلالة بانورامية على المدينة من الأعلى", bedrooms: 4, area: 260, features: ["إطلالة مدينة", "مسبح", "مصعد خاص"] },
+  { id: "ranch", name: "مزرعة كبيرة مع إسطبل", price: 3800, emoji: "🐎", desc: "مساحات واسعة مناسبة لتربية الخيل", bedrooms: 4, area: 500, features: ["حديقة كبيرة", "إسطبل خاص"] },
 ];
 
 const ESTATE_FILTERS = [
@@ -64,21 +69,25 @@ const CLOTHES = [
 ];
 
 const SHOPS = {
-  veggies: { name: "سوق الخضار", emoji: "🥦", items: [["طماطم", 5], ["خيار", 4], ["بطاطس", 3], ["بصل", 3], ["جزر", 4], ["فلفل", 5], ["باذنجان", 4], ["كوسا", 4], ["ملفوف", 3], ["خس", 3], ["فجل", 2], ["ثوم", 2], ["بازلاء", 5], ["فاصولياء", 5], ["سبانخ", 4], ["ماء باردة", 2]] },
-  fruits: { name: "سوق الفواكه", emoji: "🍎", items: [["تفاح", 6], ["موز", 5], ["برتقال", 5], ["عنب", 8], ["فراولة", 9], ["بطيخ", 10], ["شمام", 8], ["مانجو", 9], ["أناناس", 10], ["كيوي", 8], ["إجاص", 6], ["خوخ", 7], ["مشمش", 6], ["رمان", 9], ["ليمون", 3], ["جوافة", 6], ["ماء باردة", 2]] },
-  sweets: { name: "سوق الحلويات", emoji: "🍫", items: [["شوكولاتة", 8], ["كيك", 15], ["رقائق بطاطس", 4], ["دونات", 6], ["آيسكريم", 7], ["بسكويت", 5], ["حلاوة", 6], ["كنافة", 12], ["بقلاوة", 14], ["مهلبية", 8], ["ماء باردة", 2]] },
-  meat: { name: "سوق اللحوم", emoji: "🥩", items: [["لحم بقر", 20], ["دجاج", 12], ["لحم غنم", 22], ["كبدة", 15], ["سجق", 14], ["لحم مفروم", 18], ["ديك رومي", 16], ["أجنحة دجاج", 10], ["ستيك", 25], ["ماء باردة", 2]] },
-  fish: { name: "سوق السمك", emoji: "🐟", items: [["سمك", 15], ["روبيان", 18], ["سلمون", 25], ["تونة", 20], ["هامور", 22], ["حبار", 17], ["كابوريا", 24], ["بلطي", 12], ["سردين", 8], ["محار", 20], ["ماء باردة", 2]] },
-  home: { name: "مستلزمات المنزل", emoji: "🛋️", items: [["أثاث", 50], ["ديكور", 30], ["مسبح 🏊", 200], ["ماء باردة", 2]] },
-  cafe: { name: "كافيه", emoji: "☕", items: [["قهوة", 10], ["عصير", 8], ["شاي", 6], ["كيك صغير", 12], ["لاتيه", 14], ["كابتشينو", 13], ["إسبريسو", 9], ["موكا", 15], ["شوكولاتة ساخنة", 12], ["شاي أخضر", 7], ["كرواسون", 10], ["وافل", 16], ["تشيز كيك", 18], ["سموذي فواكه", 14], ["ميلك شيك", 13], ["دونات", 8], ["فرابتشينو", 16], ["ماتشا لاتيه", 15], ["مافن", 9], ["كوكيز", 7], ["ماء باردة", 2]] },
-  restaurant: { name: "مطعم", emoji: "🍽️", items: [["برجر", 15], ["بيتزا", 20], ["باستا", 18], ["سلطة", 10], ["شاورما", 12], ["كبسة دجاج", 22], ["مندي لحم", 28], ["ستيك مشوي", 30], ["سوشي", 25], ["تاكو", 14], ["ساندويتش", 11], ["شوربة", 9], ["دجاج مشوي", 20], ["أرز بخاري", 17], ["فطيرة سبانخ", 8], ["مقبلات مشكلة", 16], ["مشاوي مشكلة", 32], ["برياني", 19], ["فاهيتا", 21], ["كريب", 13], ["ماء باردة", 2]] },
-  supermarket: { name: "سوبر ماركت", emoji: "🛒", items: [["حليب", 6], ["خبز", 4], ["بيض", 7], ["أرز", 10], ["سكر", 8], ["مناديل", 5], ["منظف", 9], ["زيت طبخ", 11], ["ملح", 2], ["معكرونة", 6], ["جبنة", 9], ["زبدة", 8], ["عصير معلب", 5], ["شاي مطحون", 7], ["قهوة مطحونة", 12], ["مربى", 8], ["زبادي", 4], ["ماء باردة", 2]] },
-  phones: { name: "متجر الهواتف", emoji: "📱", items: [["هاتف اقتصادي", 300], ["هاتف متوسط", 700], ["هاتف فاخر", 1500], ["هاتف قديم كلاسيكي", 150], ["هاتف قابل للطي", 2000], ["تابلت", 900], ["ساعة ذكية", 600], ["ماء باردة", 2]] },
-  perfumes: { name: "متجر العطور", emoji: "🌸", items: [["عطر خفيف", 40], ["عطر فاخر", 90], ["عطر نادر", 180], ["عطر ورد", 60], ["عطر عود", 150], ["عطر ياسمين", 55], ["عطر مسك", 70], ["عطر فرنسي", 130], ["عطر صيفي", 45], ["عطر شتوي", 65], ["ماء باردة", 2]] },
-  mallclothes: { name: "متجر الملابس", emoji: "👗", items: [["فستان سهرة", 120], ["بدلة رسمية", 150], ["حذاء رياضي", 70], ["نظارة شمس", 35], ["جاكيت جلد", 140], ["تنورة", 60], ["قميص", 45], ["بنطلون جينز", 55], ["حقيبة يد", 90], ["قبعة", 25], ["ماء باردة", 2]] },
-  salon: { name: "صالون تجميل", emoji: "💇‍♀️", items: [["مكياج", 40], ["تسريحة شعر", 35], ["صبغة شعر", 50], ["مانيكير", 25], ["بديكير", 20], ["رموش", 30], ["ماء باردة", 2]] },
-  airline: { name: "الطيران", emoji: "✈️", items: [["عصير", 8], ["ماء", 3], ["وجبة دجاج", 20], ["وجبة نباتية", 18], ["قهوة", 6], ["بطانية", 5], ["ماء باردة", 2]] },
-  pharmacy: { name: "الصيدلية", emoji: "💊", items: [["فيتامين سي", 15], ["فيتامين د", 18], ["ضمادات", 6], ["مطهر جروح", 10], ["كريم مرطب", 12], ["معقم يدين", 8], ["كمامات", 7], ["ميزان حرارة", 20], ["شراب كحة", 14], ["حبوب مسكنة", 12], ["قطرة عين", 10], ["بلسم شفايف", 5], ["رباط طبي", 9], ["شاي أعشاب", 8], ["حقيبة إسعافات أولية", 35], ["ماء باردة", 2]] },
+  veggies: { name: "سوق الخضار", emoji: "🥦", items: [["طماطم", 5], ["خيار", 4], ["بطاطس", 3], ["بصل", 3], ["جزر", 4], ["فلفل", 5], ["باذنجان", 4], ["كوسا", 4], ["ملفوف", 3], ["خس", 3], ["فجل", 2], ["ثوم", 2], ["بازلاء", 5], ["فاصولياء", 5], ["سبانخ", 4], ["فطر", 6], ["بامية", 5], ["لفت", 3], ["شمندر", 4], ["بقدونس", 2], ["كرفس", 3], ["نعنع", 2], ["ورق عنب", 6]] },
+  fruits: { name: "سوق الفواكه", emoji: "🍎", items: [["تفاح", 6], ["موز", 5], ["برتقال", 5], ["عنب", 8], ["فراولة", 9], ["بطيخ", 10], ["شمام", 8], ["مانجو", 9], ["أناناس", 10], ["كيوي", 8], ["إجاص", 6], ["خوخ", 7], ["مشمش", 6], ["رمان", 9], ["ليمون", 3], ["جوافة", 6], ["كرز", 12], ["تين", 8], ["بلح", 7], ["جوز هند", 9], ["حصرم", 6], ["إسكدنيا", 7]] },
+  sweets: { name: "سوق الحلويات", emoji: "🍫", items: [["شوكولاتة", 8], ["كيك", 15], ["رقائق بطاطس", 4], ["دونات", 6], ["آيسكريم", 7], ["بسكويت", 5], ["حلاوة", 6], ["كنافة", 12], ["بقلاوة", 14], ["مهلبية", 8], ["شيبس دوريتوز", 5], ["شيبس تورتيلا", 5], ["شيبس ملح وخل", 4], ["شيبس جبنة", 4], ["مقرمشات ذرة", 4], ["فشار", 5], ["بسكويت مملح", 4], ["مصاصة", 2], ["حلوى جيلي", 5], ["وافل بالعسل", 9], ["بسكوت مالح", 4], ["بيجلز", 5], ["وافل ويفر شوكولاتة", 5], ["شوكولاتة جالكسي", 7]] },
+  meat: { name: "سوق اللحوم", emoji: "🥩", items: [["لحم بقر", 20], ["دجاج", 12], ["لحم غنم", 22], ["كبدة", 15], ["سجق", 14], ["لحم مفروم", 18], ["ديك رومي", 16], ["أجنحة دجاج", 10], ["ستيك", 25]] },
+  fish: { name: "سوق السمك", emoji: "🐟", items: [["سمك", 15], ["روبيان", 18], ["سلمون", 25], ["تونة", 20], ["هامور", 22], ["حبار", 17], ["كابوريا", 24], ["بلطي", 12], ["سردين", 8], ["محار", 20], ["جمبري", 19]] },
+  home: { name: "مستلزمات المنزل", emoji: "🛋️", items: [["أثاث", 50], ["ديكور", 30], ["مسبح 🏊", 200], ["سرير", 120], ["أريكة", 150], ["طاولة طعام", 100], ["كراسي (طقم)", 80], ["خزانة ملابس", 130], ["ثلاجة", 400], ["غسالة", 350], ["مكيف", 500], ["مايكرويف", 90], ["فرن", 200], ["مروحة", 40], ["ستائر", 35], ["سجادة", 60], ["مصابيح", 20], ["مرايا", 45], ["أواني مطبخ (طقم)", 70], ["شراشف ومفارش", 30], ["مناشف", 15]] },
+  cafe: { name: "كافيه", emoji: "☕", items: [["قهوة", 10], ["عصير", 8], ["شاي", 6], ["كيك صغير", 12], ["لاتيه", 14], ["كابتشينو", 13], ["إسبريسو", 9], ["موكا", 15], ["شوكولاتة ساخنة", 12], ["شاي أخضر", 7], ["كرواسون", 10], ["وافل", 16], ["تشيز كيك", 18], ["سموذي فواكه", 14], ["ميلك شيك", 13], ["دونات", 8], ["فرابتشينو", 16], ["ماتشا لاتيه", 15], ["مافن", 9], ["كوكيز", 7], ["آيس لاتيه", 14], ["شاي كرك", 8], ["عصير مانجو", 10], ["توست فرنسي", 12], ["ماء باردة", 2]] },
+  restaurant: { name: "مطعم", emoji: "🍽️", items: [["برجر", 15], ["بيتزا", 20], ["باستا", 18], ["سلطة", 10], ["شاورما", 12], ["كبسة دجاج", 22], ["مندي لحم", 28], ["ستيك مشوي", 30], ["سوشي", 25], ["تاكو", 14], ["ساندويتش", 11], ["شوربة", 9], ["دجاج مشوي", 20], ["أرز بخاري", 17], ["فطيرة سبانخ", 8], ["مقبلات مشكلة", 16], ["مشاوي مشكلة", 32], ["برياني", 19], ["فاهيتا", 21], ["كريب", 13], ["بيتزا خضار", 19], ["دجاج كرسبي", 17], ["أرز كابسة لحم", 24], ["حساء عدس", 8], ["ماء باردة", 2]] },
+  supermarket: { name: "سوبر ماركت", emoji: "🛒", items: [["حليب", 6], ["خبز", 4], ["بيض", 7], ["أرز", 10], ["سكر", 8], ["مناديل", 5], ["منظف", 9], ["زيت طبخ", 11], ["ملح", 2], ["معكرونة", 6], ["جبنة", 9], ["زبدة", 8], ["عصير معلب", 5], ["شاي مطحون", 7], ["قهوة مطحونة", 12], ["مربى", 8], ["زبادي", 4], ["دقيق", 6], ["خل", 3], ["صلصة طماطم", 5], ["تونة معلبة", 8], ["فول معلب", 4], ["حمص معلب", 5], ["مسحوق غسيل", 12], ["معطر جو", 8], ["كيس قمامة", 6], ["فوط ورقية", 5], ["معجون أسنان", 6], ["شامبو", 10], ["صابون", 4], ["علبة نوتيلا", 22], ["كاسات بلاستيك", 6], ["نودلز دجاج", 4], ["نودلز حار", 4], ["نودلز لحم", 4], ["نودلز كاري", 4], ["نودلز عادي", 3], ["ماء باردة", 2]] },
+  phones: { name: "متجر الهواتف", emoji: "📱", items: [["هاتف اقتصادي", 300], ["هاتف متوسط", 700], ["هاتف فاخر", 1500], ["هاتف قديم كلاسيكي", 150], ["هاتف قابل للطي", 2000], ["تابلت", 900], ["ساعة ذكية", 600], ["سماعات لاسلكية", 250], ["شاحن سريع", 40], ["كفر حماية", 20], ["شاشة حماية", 15], ["باور بانك", 80], ["كاميرا رقمية", 1100], ["حاسوب", 2500], ["ايربودز", 350]] },
+  perfumes: { name: "متجر العطور", emoji: "🌸", items: [["عطر خفيف", 40], ["عطر فاخر", 90], ["عطر نادر", 180], ["عطر ورد", 60], ["عطر عود", 150], ["عطر ياسمين", 55], ["عطر مسك", 70], ["عطر فرنسي", 130], ["عطر صيفي", 45], ["عطر شتوي", 65], ["عطر عنبر", 95], ["عطر خزامى", 50], ["عطر فانيليا", 58], ["عطر رجالي فاخر", 140], ["مزيل عرق معطر", 20]] },
+  mallclothes: { name: "متجر الملابس", emoji: "👗", items: [["فستان سهرة", 120], ["بدلة رسمية", 150], ["حذاء رياضي", 70], ["نظارة شمس", 35], ["جاكيت جلد", 140], ["تنورة", 60], ["قميص", 45], ["بنطلون جينز", 55], ["حقيبة يد", 90], ["قبعة", 25], ["فستان كاجوال", 50], ["عباية", 110], ["كنزة صوف", 65], ["حذاء كعب", 80], ["شورت رياضي", 30], ["إيشارب", 20]] },
+  salon: { name: "صالون تجميل", emoji: "💇‍♀️", items: [["مكياج", 40], ["تسريحة شعر", 35], ["صبغة شعر", 50], ["مانيكير", 25], ["بديكير", 20], ["رموش", 30]] },
+  airline: { name: "الطيران", emoji: "✈️", items: [["عصير", 8], ["ماء", 3], ["وجبة دجاج", 20], ["وجبة نباتية", 18], ["قهوة", 6], ["بطانية", 5]] },
+  pharmacy: { name: "الصيدلية", emoji: "💊", items: [["فيتامين سي", 15], ["فيتامين د", 18], ["ضمادات", 6], ["مطهر جروح", 10], ["كريم مرطب", 12], ["معقم يدين", 8], ["كمامات", 7], ["ميزان حرارة", 20], ["شراب كحة", 14], ["حبوب مسكنة", 12], ["قطرة عين", 10], ["بلسم شفايف", 5], ["رباط طبي", 9], ["شاي أعشاب", 8], ["حقيبة إسعافات أولية", 35]] },
+  library: { name: "المكتبة والقرطاسية", emoji: "📚", items: [["كراسة مدرسية", 5], ["كراسة رسم", 6], ["قصة أطفال", 8], ["رواية", 14], ["كتاب علمي", 16], ["كتاب طبخ", 12], ["قاموس", 20], ["كتاب ديني", 10], ["مجلة", 4], ["أقلام رصاص (علبة)", 6], ["أقلام ملونة", 10], ["حقيبة مدرسية", 45], ["مسطرة وأدوات هندسية", 8], ["دفتر ملاحظات", 5], ["لانش بوكس", 25], ["مطارة ماء", 15], ["دفتر تلوين", 8], ["دفتر رسم", 9], ["أقلام حبر", 7], ["فلوماستر 12 لون", 10], ["فلوماستر 24 لون", 18], ["فلوماستر 36 لون", 26], ["ألوان خشب 12 لون", 9], ["ألوان خشب 24 لون", 16], ["ألوان خشب 36 لون", 24], ["ألوان خشب 48 لون", 32], ["ألوان شمع 12 لون", 8], ["ألوان شمع 24 لون", 14], ["ألوان شمع 36 لون", 20], ["ألوان شمع 48 لون", 28], ["لاصق شفاف", 3], ["صمغ", 3], ["مقص", 4], ["ملف حفظ", 6], ["دوسيه", 8], ["تجليد كتاب", 10], ["ملصقات نجوم", 4], ["ملصقات كرتونية", 5]] },
+  toysgirls: { name: "ألعاب بنات", emoji: "🎀", items: [["دمية باربي", 30], ["بيت الدمى", 60], ["مطبخ ألعاب", 55], ["عربة أطفال (لعبة)", 35], ["طقم مكياج أطفال", 25], ["أقراط لعب", 10], ["تاج أميرة", 15], ["فستان تنكري", 40], ["دراجة وردية", 70], ["لعبة رسم بالألوان", 18], ["دفتر تلوين", 8], ["دبدوب", 20], ["بيانو صغير", 45]] },
+  toysboys: { name: "ألعاب أولاد", emoji: "🚀", items: [["سيارة تحكم عن بعد", 45], ["روبوت لعبة", 50], ["طائرة لعبة", 35], ["كرة قدم", 15], ["دراجة هوائية للأطفال", 70], ["ليغو", 40], ["سيف لعبة", 12], ["بندقية ماء", 10], ["قطار كهربائي", 55], ["دبابة لعبة", 30], ["طقم أدوات لعب", 20], ["لوحة كرة سلة", 60]] },
+  maid: { name: "الخادمة المنزلية", emoji: "🧹", items: [["كنس الأرضية", 15], ["مسح النوافذ", 15], ["غسل الصحون", 12], ["ترتيب الأسرة", 10], ["تنظيف الحمام", 18], ["كي الملابس", 14], ["تنظيف المطبخ", 20], ["إخراج القمامة", 8]] },
 };
 
 // محل المجوهرات: كل قطعة متوفرة بثلاث خامات مختلفة
@@ -91,30 +100,68 @@ const JEWELRY_MATERIALS = [{ label: "خرز", mult: 0.5 }, { label: "فضة", mu
 const jewelryItems = [];
 JEWELRY_BASE.forEach((b) => JEWELRY_MATERIALS.forEach((m) => jewelryItems.push([`${b.name} ${m.label}`, Math.round(b.base * m.mult)])));
 SHOPS.jewelry = { name: "محل المجوهرات", emoji: "💍", items: jewelryItems };
-jewelryItems.push(["ماء باردة", 2]);
 
 const HOSPITAL_QUESTIONS = [
   { q: "شخص عنده جرح بسيط، أول إسعاف؟", options: ["تنظيف الجرح وتغطيته", "تجاهله", "سكب ماء ساخن", "لا شيء"], answer: "تنظيف الجرح وتغطيته" },
   { q: "كم عدد حجرات القلب؟", options: ["2", "3", "4", "5"], answer: "4" },
   { q: "أي فيتامين تصنعه الشمس بالجسم؟", options: ["A", "B12", "C", "D"], answer: "D" },
   { q: "العظم الأطول بجسم الإنسان؟", options: ["عظم الفخذ", "عظم الذراع", "عظم الترقوة", "عظم الساق"], answer: "عظم الفخذ" },
+  { q: "كم عدد أسنان الإنسان البالغ الطبيعي؟", options: ["28", "30", "32", "34"], answer: "32" },
+  { q: "أكبر عضو بجسم الإنسان؟", options: ["الكبد", "الجلد", "الرئة", "المعدة"], answer: "الجلد" },
+  { q: "أي جهاز يقيس ضغط الدم؟", options: ["ترمومتر", "سماعة طبية", "جهاز ضغط", "ميزان"], answer: "جهاز ضغط" },
+  { q: "درجة حرارة جسم الإنسان الطبيعية تقريباً؟", options: ["35", "37", "39", "41"], answer: "37" },
+  { q: "أول شي تسويه لو غُشي على شخص؟", options: ["ترفع رجليه وتتصل بالطوارئ", "تسقيه ماء وهو مغمى عليه", "تتركه لحاله", "تهزه بقوة"], answer: "ترفع رجليه وتتصل بالطوارئ" },
+  { q: "الفيتامين المسؤول عن تجلط الدم؟", options: ["A", "K", "E", "C"], answer: "K" },
 ];
 const POLICE_QUESTIONS = [
   { q: "لو شفت حادث سيارة، أول شي تسويه؟", options: ["تتصل بالطوارئ", "تكمل طريقك", "تصوّر بس", "تهرب"], answer: "تتصل بالطوارئ" },
   { q: "إشارة المرور الحمراء تعني؟", options: ["قف", "استمر", "أسرع", "انعطف"], answer: "قف" },
   { q: "الحزام أثناء القيادة يُلبس متى؟", options: ["دايماً", "بس بالسفر", "لما فيه شرطي", "ما يلزم"], answer: "دايماً" },
   { q: "أول شي تسويه لو لقيت طفل تائه؟", options: ["تساعده وتبلغ الجهات المختصة", "تتجاهله", "تصوره", "تتركه"], answer: "تساعده وتبلغ الجهات المختصة" },
+  { q: "الإشارة الصفراء بإشارة المرور تعني؟", options: ["استعد للتوقف", "أسرع", "قف فوراً", "انعطف يمين"], answer: "استعد للتوقف" },
+  { q: "أفضل تصرف عند رؤية شجار بالشارع؟", options: ["تبلغ الشرطة", "تتدخل بالقوة", "تصور وتنشر", "تتجاهل"], answer: "تبلغ الشرطة" },
+  { q: "المسافة الآمنة بين السيارات أثناء القيادة تعتمد على؟", options: ["السرعة والطقس", "لون السيارة", "عدد الركاب", "وقت اليوم"], answer: "السرعة والطقس" },
+  { q: "الممر الخاص بالمشاة يسمى؟", options: ["ممر المشاة", "حارة سريعة", "موقف سيارات", "جسر"], answer: "ممر المشاة" },
 ];
 const FIRE_QUESTIONS = [
   { q: "لو شب حريق صغير بزيت المقلاة، تطفيه بـ؟", options: ["غطاء المقلاة", "ماء", "تجاهله", "بنزين"], answer: "غطاء المقلاة" },
   { q: "أول شي تسويه عند سماع جرس الحريق؟", options: ["تخرج بهدوء من أقرب مخرج", "تختبئ تحت الطاولة", "تكمل شغلك", "تاخذ المصعد"], answer: "تخرج بهدوء من أقرب مخرج" },
   { q: "جهاز إطفاء الحريق اليدوي يسمى؟", options: ["طفاية الحريق", "مروحة", "مضخة ماء", "خرطوم غاز"], answer: "طفاية الحريق" },
   { q: "عند وجود دخان كثيف بالغرفة، الأصح؟", options: ["تزحف قريب من الأرض", "تقف منتصب", "تفتح كل النوافذ وتقف بمنتصفها", "تختبئ بالدولاب"], answer: "تزحف قريب من الأرض" },
+  { q: "أثناء الحريق، ما الممنوع استخدامه للنزول؟", options: ["المصعد", "الدرج", "سلم الطوارئ", "الباب الرئيسي"], answer: "المصعد" },
+  { q: "لمس باب ساخن أثناء الحريق يعني؟", options: ["فيه نار خلفه، لا تفتحه", "افتحه بسرعة", "اكسره", "لا شيء"], answer: "فيه نار خلفه، لا تفتحه" },
+  { q: "نقطة تجمع الموظفين وقت الحريق تسمى؟", options: ["نقطة التجمع", "المستودع", "الاستراحة", "المدخل الرئيسي"], answer: "نقطة التجمع" },
 ];
 
 const BUYER_NAMES = ["أبو فهد", "أم سارة", "خالد التاجر", "شركة العقار الذهبي", "نورة المستثمرة", "أبو تركي"];
 
+const ALL_ROOMS = [
+  { id: "kitchen", name: "المطبخ", emoji: "🍳" },
+  { id: "living", name: "الصالة", emoji: "🛋️" },
+  { id: "bedroom", name: "غرفة النوم", emoji: "🛌" },
+  { id: "bathroom", name: "الحمام", emoji: "🛁" },
+  { id: "balcony", name: "البرندا", emoji: "🌇" },
+  { id: "guest", name: "غرفة الضيوف", emoji: "🛏️" },
+  { id: "garden", name: "الحديقة", emoji: "🌳" },
+  { id: "kidsroom", name: "غرفة الأطفال", emoji: "🧸" },
+  { id: "library", name: "مكتبة المنزل", emoji: "📚" },
+];
+
+function getAvailableRooms(house) {
+  if (!house) return ALL_ROOMS.slice(0, 4);
+  const ids = new Set(["kitchen", "living", "bedroom", "bathroom"]);
+  const bedrooms = house.bedrooms || 3;
+  const area = house.area || 150;
+  const features = house.features || [];
+  if (bedrooms >= 3) { ids.add("guest"); ids.add("kidsroom"); }
+  if (area >= 130) ids.add("balcony");
+  if (features.some((f) => f.includes("حديقة"))) ids.add("garden");
+  if (bedrooms >= 5 || house.id === "palace") ids.add("library");
+  return ALL_ROOMS.filter((r) => ids.has(r.id));
+}
+
 const CAR_COLORS = ["أبيض", "أحمر", "أزرق", "أسود", "وردي"];
+const NOTEBOOK_ITEMS = ["كراسة مدرسية", "كراسة رسم"];
 
 const VEHICLES_BY_ZONE = {
   stable: [{ id: "horse", name: "حصان", price: 600, emoji: "🐴" }],
@@ -151,6 +198,26 @@ const AIRPORT_DESTINATIONS = [
   { id: "england", name: "إنجلترا", emoji: "🇬🇧", price: 320 },
   { id: "austria", name: "النمسا", emoji: "🇦🇹", price: 260 },
   { id: "romania", name: "رومانيا", emoji: "🇷🇴", price: 180 },
+  { id: "germany", name: "ألمانيا", emoji: "🇩🇪", price: 310 },
+  { id: "italy", name: "إيطاليا", emoji: "🇮🇹", price: 290 },
+  { id: "greece", name: "اليونان", emoji: "🇬🇷", price: 240 },
+  { id: "egypt", name: "مصر", emoji: "🇪🇬", price: 140 },
+  { id: "uae", name: "الإمارات", emoji: "🇦🇪", price: 120 },
+  { id: "switzerland", name: "سويسرا", emoji: "🇨🇭", price: 400 },
+  { id: "maldives", name: "المالديف", emoji: "🏝️", price: 550 },
+  { id: "brazil", name: "البرازيل", emoji: "🇧🇷", price: 480 },
+  { id: "southkorea", name: "كوريا الجنوبية", emoji: "🇰🇷", price: 420 },
+];
+
+const ACCOUNTANT_QUESTIONS = [
+  { q: "لو اشتريت شي بـ80$ وبعته بـ120$، ربحك كم؟", options: ["30", "40", "50", "60"], answer: "40" },
+  { q: "كم ناتج جمع 250 + 175؟", options: ["405", "415", "425", "435"], answer: "425" },
+  { q: "لو عندك 500$ وصرفت 150$، كم يتبقى؟", options: ["300", "350", "400", "450"], answer: "350" },
+  { q: "الفرق بين الإيرادات والمصروفات يسمى؟", options: ["الربح أو الخسارة", "الأصول", "الالتزامات", "رأس المال"], answer: "الربح أو الخسارة" },
+  { q: "كم ناتج 15% من 200؟", options: ["20", "25", "30", "35"], answer: "30" },
+  { q: "ما ناتج قسمة 900 على 3؟", options: ["200", "250", "300", "350"], answer: "300" },
+  { q: "السجل الذي يسجل فيه الدخل والمصروف يومياً يسمى؟", options: ["دفتر اليومية", "دفتر الرسم", "دفتر الطبخ", "لا شيء"], answer: "دفتر اليومية" },
+  { q: "كم ناتج 12 × 11؟", options: ["122", "132", "142", "152"], answer: "132" },
 ];
 
 const QUIZ_QUESTIONS = [
@@ -162,6 +229,14 @@ const QUIZ_QUESTIONS = [
   { q: "كم ناتج 100 ÷ 4؟", options: ["15", "20", "25", "30"], answer: "25" },
   { q: "كم عدد شهور السنة؟", options: ["10", "11", "12", "13"], answer: "12" },
   { q: "ما ناتج 8 − 3؟", options: ["4", "5", "6", "7"], answer: "5" },
+  { q: "ما هي أطول نهر بالعالم؟", options: ["النيل", "الأمازون", "الفرات", "دجلة"], answer: "النيل" },
+  { q: "كم ناتج 6 × 6؟", options: ["30", "32", "36", "42"], answer: "36" },
+  { q: "ما هي أصغر قارة بالعالم؟", options: ["أستراليا", "أوروبا", "أفريقيا", "آسيا"], answer: "أستراليا" },
+  { q: "كم عدد أضلاع المثلث؟", options: ["2", "3", "4", "5"], answer: "3" },
+  { q: "ما ناتج 15 − 6؟", options: ["7", "8", "9", "10"], answer: "9" },
+  { q: "أي كوكب أقرب للشمس؟", options: ["الأرض", "عطارد", "المريخ", "الزهرة"], answer: "عطارد" },
+  { q: "كم ناتج 12 ÷ 3؟", options: ["3", "4", "5", "6"], answer: "4" },
+  { q: "ما هي عاصمة مصر؟", options: ["القاهرة", "الإسكندرية", "الجيزة", "الأقصر"], answer: "القاهرة" },
 ];
 
 const NPC_LINES = [
@@ -385,7 +460,7 @@ function DeliveryGame({ rounds, timeLimit, sounds, onFinish }) {
     const source = DELIVERY_SOURCES[Math.floor(Math.random() * DELIVERY_SOURCES.length)];
     const item = itemPool[source][Math.floor(Math.random() * itemPool[source].length)];
     const houseNumber = 100 + Math.floor(Math.random() * 900);
-    return { source, item, houseNumber, basePay: 10 };
+    return { source, item, houseNumber, basePay: 18 };
   }));
   const [idx, setIdx] = useState(0);
   const [timeLeft, setTimeLeft] = useState(timeLimit);
@@ -409,7 +484,7 @@ function DeliveryGame({ rounds, timeLimit, sounds, onFinish }) {
   };
 
   const handleDeliver = () => {
-    const bonus = Math.round((timeLeft / timeLimit) * 20);
+    const bonus = Math.round((timeLeft / timeLimit) * 35);
     finishRound(current.basePay + bonus);
   };
 
@@ -443,6 +518,100 @@ function DeliveryGame({ rounds, timeLimit, sounds, onFinish }) {
         <button onClick={handleDeliver} className="w-full bg-[#F4A261] text-white font-bold py-3 rounded-xl">
           🛵 سلّم الطلب
         </button>
+      )}
+    </div>
+  );
+}
+
+/* ---------------------------------- مطعم الأندومي (تحضير خطوة بخطوة) ---------------------------------- */
+
+const NOODLE_TYPES = ["باكيت", "كوب"];
+const NOODLE_COLORS = ["أبيض", "أحمر", "أزرق", "أسود", "وردي"];
+const NOODLE_CUSTOMERS = ["آسيا", "سارة", "خالد", "نورة", "فهد", "أبو تركي", "أم فهد"];
+
+function NoodleGame({ rounds, timeLimit, sounds, onFinish }) {
+  const [seq] = useState(() => Array.from({ length: rounds }, () => ({
+    type: NOODLE_TYPES[Math.floor(Math.random() * NOODLE_TYPES.length)],
+    color: NOODLE_COLORS[Math.floor(Math.random() * NOODLE_COLORS.length)],
+    customer: NOODLE_CUSTOMERS[Math.floor(Math.random() * NOODLE_CUSTOMERS.length)],
+  })));
+  const [idx, setIdx] = useState(0);
+  const [step, setStep] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(timeLimit);
+  const [feedback, setFeedback] = useState(null);
+  const [lastPay, setLastPay] = useState(0);
+  const earnedRef = useRef(0);
+  const doneRef = useRef(false);
+  const current = seq[idx];
+  const correctLabel = `باكيت اندومي ${current.type === "كوب" ? "(كوب) " : ""}${current.color}`;
+
+  const packetChoices = useMemo(() => {
+    const opts = new Set([correctLabel]);
+    while (opts.size < 4) {
+      const t = NOODLE_TYPES[Math.floor(Math.random() * NOODLE_TYPES.length)];
+      const c = NOODLE_COLORS[Math.floor(Math.random() * NOODLE_COLORS.length)];
+      opts.add(`باكيت اندومي ${t === "كوب" ? "(كوب) " : ""}${c}`);
+    }
+    return shuffleArray([...opts]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idx]);
+
+  const finishOrder = (success) => {
+    if (doneRef.current) return;
+    doneRef.current = true;
+    let payAmt = 0;
+    if (success) { payAmt = 20 + Math.round((timeLeft / timeLimit) * 20); earnedRef.current += payAmt; sounds.cash(); }
+    else sounds.buzz();
+    setLastPay(payAmt);
+    setFeedback(success ? "done" : "missed");
+    setTimeout(() => {
+      if (idx + 1 < seq.length) { setIdx((i) => i + 1); setStep(0); }
+      else onFinish(earnedRef.current, seq.length);
+    }, 800);
+  };
+
+  const pickPacket = (label) => {
+    if (label === correctLabel) { sounds.click(); setStep(1); } else { sounds.buzz(); }
+  };
+
+  useEffect(() => {
+    doneRef.current = false;
+    setTimeLeft(timeLimit);
+    setFeedback(null);
+    const timer = setInterval(() => {
+      setTimeLeft((t) => {
+        if (t <= 1) { clearInterval(timer); finishOrder(false); return 0; }
+        return t - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idx]);
+
+  return (
+    <div className="space-y-3 text-center">
+      <p className="text-sm text-[#AAAAAA]">طلب {idx + 1} من {seq.length}</p>
+      <div className="w-full h-2 bg-[#2A2A2A] rounded-full overflow-hidden">
+        <div className="h-full bg-[#F4A261] transition-all" style={{ width: `${(timeLeft / timeLimit) * 100}%` }} />
+      </div>
+      <p className="font-bold text-[#F5F5F5]">🍜 {current.customer} تريد: {correctLabel}</p>
+      {feedback ? (
+        <p className={`font-bold text-xl ${feedback === "done" ? "text-green-500" : "text-red-400"}`}>
+          {feedback === "done" ? `جاهز! ربحت ${lastPay}$ 🍜` : "طفشت الطلب 😅"}
+        </p>
+      ) : step === 0 ? (
+        <div className="grid grid-cols-2 gap-2">
+          {packetChoices.map((label) => (
+            <button key={label} onClick={() => pickPacket(label)}
+              className="py-2.5 rounded-xl font-semibold text-[#F5F5F5] border-2 border-[#333333]">{label}</button>
+          ))}
+        </div>
+      ) : step === 1 ? (
+        <button onClick={() => { sounds.click(); setStep(2); }} className="w-full bg-[#F4A261] text-white font-bold py-3 rounded-xl">ضعه بصحن 🍜</button>
+      ) : step === 2 ? (
+        <button onClick={() => { sounds.splash(); setStep(3); }} className="w-full bg-[#F4A261] text-white font-bold py-3 rounded-xl">صب ماء ساخن 💧</button>
+      ) : (
+        <button onClick={() => finishOrder(true)} className="w-full bg-[#F4A261] text-white font-bold py-3 rounded-xl">أضف البهارات والصوص 🧂</button>
       )}
     </div>
   );
@@ -541,6 +710,7 @@ function LifeSimGame() {
   const [pool, setPool] = useState(false);
   const [ownedClothes, setOwnedClothes] = useState(["casual"]);
   const [inventory, setInventory] = useState({});
+  const [itemRooms, setItemRooms] = useState({});
   const [carriedItems, setCarriedItems] = useState({});
   const [resources, setResources] = useState({ wood: 0, stone: 0, brick: 0 });
   const [ownedVehicles, setOwnedVehicles] = useState([]);
@@ -554,6 +724,8 @@ function LifeSimGame() {
   const [cardDebt, setCardDebt] = useState(0);
   const [creditLimit] = useState(2000);
   const [cardPayAmount, setCardPayAmount] = useState("");
+  const [pendingPayment, setPendingPayment] = useState(null);
+  const [pendingLibItem, setPendingLibItem] = useState(null);
   const [modal, setModal] = useState(null);
   const [estateFilter, setEstateFilter] = useState("all");
   const [toast, setToast] = useState(null);
@@ -574,7 +746,7 @@ function LifeSimGame() {
           const s = JSON.parse(raw);
           setCharacter(s.character); setMoney(s.money); setHouse(s.house);
           setPool(s.pool); setOwnedClothes(s.ownedClothes || ["casual"]);
-          setInventory(s.inventory || {}); setCarriedItems(s.carriedItems || {}); setResources(s.resources || { wood: 0, stone: 0, brick: 0 });
+          setInventory(s.inventory || {}); setItemRooms(s.itemRooms || {}); setCarriedItems(s.carriedItems || {}); setResources(s.resources || { wood: 0, stone: 0, brick: 0 });
           setOwnedVehicles((s.ownedVehicles || []).map((v) => {
             if (typeof v === "string") {
               const cat = ALL_VEHICLES.find((a) => a.id === v) || {};
@@ -597,11 +769,11 @@ function LifeSimGame() {
   useEffect(() => {
     if (stage !== "world" && stage !== "build" && stage !== "chooseHouse") return;
     const t = setTimeout(() => {
-      const state = { character, money, house, pool, ownedClothes, inventory, carriedItems, resources, ownedVehicles, activeVehicle, chatHistories, bankBalance, hasCard, cardDebt };
+      const state = { character, money, house, pool, ownedClothes, inventory, itemRooms, carriedItems, resources, ownedVehicles, activeVehicle, chatHistories, bankBalance, hasCard, cardDebt };
       localStorage.setItem("life-sim-save-v3", JSON.stringify(state));
     }, 400);
     return () => clearTimeout(t);
-  }, [character, money, house, pool, ownedClothes, inventory, carriedItems, resources, ownedVehicles, activeVehicle, chatHistories, bankBalance, hasCard, cardDebt, stage]);
+  }, [character, money, house, pool, ownedClothes, inventory, itemRooms, carriedItems, resources, ownedVehicles, activeVehicle, chatHistories, bankBalance, hasCard, cardDebt, stage]);
 
   useEffect(() => { setEnabled(soundOn); }, [soundOn]);
   useEffect(() => { musicOn ? startMusic() : stopMusic(); }, [musicOn]);
@@ -612,7 +784,7 @@ function LifeSimGame() {
   const buyHouse = (h) => {
     if (money < h.price) { setToast("ما عندك فلوس كافية 😅"); return; }
     setMoney((m) => m - h.price);
-    setHouse({ id: h.id, name: h.name, emoji: h.emoji, custom: false });
+    setHouse({ id: h.id, name: h.name, emoji: h.emoji, custom: false, bedrooms: h.bedrooms, area: h.area, features: h.features });
     sounds.cash(); setStage("world"); setToast(`مبروك بيتك الجديد: ${h.name}!`);
   };
 
@@ -623,22 +795,16 @@ function LifeSimGame() {
     sounds.chime(); setStage("world"); setToast("مبروك! بنيت بيتك بيدك 🎉");
   };
 
-  const pay = (price, label) => {
-    if (money >= price) { setMoney((m) => m - price); return true; }
-    if (hasCard && cardDebt + price <= creditLimit) {
-      setCardDebt((d) => d + price);
-      sounds.cash(); setToast(`دفعت بالفيزا 💳 ${label ? `(${label})` : ""}`);
-      return true;
-    }
-    setToast("ما عندك فلوس ولا رصيد فيزا كافي 😅");
-    return false;
+  const requestPayment = (price, label, onSuccess) => {
+    setPendingPayment({ price, label, onSuccess });
   };
 
   const buyItem = (itemName, price) => {
-    if (!pay(price, itemName)) return;
-    if (itemName.includes("مسبح")) setPool(true);
-    setCarriedItems((inv) => ({ ...inv, [itemName]: (inv[itemName] || 0) + 1 }));
-    sounds.cash(); setToast(`اشتريت: ${itemName} ✅ (بحقيبتك الآن)`);
+    requestPayment(price, itemName, () => {
+      if (itemName.includes("مسبح")) setPool(true);
+      setCarriedItems((inv) => ({ ...inv, [itemName]: (inv[itemName] || 0) + 1 }));
+      setToast(`اشتريت: ${itemName} ✅ (بحقيبتك الآن)`);
+    });
   };
 
   const unpackBag = () => {
@@ -664,6 +830,11 @@ function LifeSimGame() {
     sounds.click();
   };
 
+  const assignRoom = (name, roomId) => {
+    setItemRooms((r) => ({ ...r, [name]: roomId }));
+    sounds.click();
+  };
+
   const sellVehicle = (uid) => {
     const inst = ownedVehicles.find((x) => x.uid === uid);
     if (!inst) return;
@@ -683,38 +854,42 @@ function LifeSimGame() {
 
   const buyHouseFromMarket = (h) => {
     if (house) { setToast("عندك بيت الحين! بيعه أول من قسم المنزل 🏠"); return; }
-    if (!pay(h.price, h.name)) return;
-    setHouse({ id: h.id, name: h.name, emoji: h.emoji, custom: false });
-    sounds.cash(); setModal(null); setToast(`مبروك بيتك الجديد: ${h.name}!`);
+    requestPayment(h.price, h.name, () => {
+      setHouse({ id: h.id, name: h.name, emoji: h.emoji, custom: false, bedrooms: h.bedrooms, area: h.area, features: h.features });
+      setModal(null); setToast(`مبروك بيتك الجديد: ${h.name}!`);
+    });
   };
 
   const buyClothes = (c) => {
     if (ownedClothes.includes(c.id)) { setCharacter((ch) => ({ ...ch, outfit: c.id })); return; }
-    if (!pay(c.price, c.name)) return;
-    setOwnedClothes((o) => [...o, c.id]);
-    setCharacter((ch) => ({ ...ch, outfit: c.id }));
-    sounds.cash(); setToast(`لبست: ${c.name} 👗`);
+    requestPayment(c.price, c.name, () => {
+      setOwnedClothes((o) => [...o, c.id]);
+      setCharacter((ch) => ({ ...ch, outfit: c.id }));
+      setToast(`لبست: ${c.name} 👗`);
+    });
   };
 
   const buyVehicle = (v, color = null) => {
-    if (!pay(v.price, v.name)) return;
-    const inst = { uid: `${v.id}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`, id: v.id, name: v.name, emoji: v.emoji, color, price: v.price };
-    setOwnedVehicles((ov) => [...ov, inst]);
-    setActiveVehicle(inst.uid);
-    setColorPickerFor(null);
-    sounds.cash(); setToast(`اشتريت ${v.name}${color ? ` (${color})` : ""} 🎉`);
+    requestPayment(v.price, v.name, () => {
+      const inst = { uid: `${v.id}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`, id: v.id, name: v.name, emoji: v.emoji, color, price: v.price };
+      setOwnedVehicles((ov) => [...ov, inst]);
+      setActiveVehicle(inst.uid);
+      setColorPickerFor(null);
+      setToast(`اشتريت ${v.name}${color ? ` (${color})` : ""} 🎉`);
+    });
   };
 
   const orderDelivery = (itemName, price, shopName) => {
     const fee = 5;
-    if (!pay(price + fee, `توصيل ${itemName}`)) return;
-    sounds.ride();
-    setToast(`طلبك بالطريق... 🛵 (${itemName} من ${shopName})`);
-    setTimeout(() => {
-      setInventory((inv) => ({ ...inv, [itemName]: (inv[itemName] || 0) + 1 }));
-      sounds.door();
-      setToast(`🛵📦 وصل طلبك: ${itemName} إلى بيتك!`);
-    }, 2200);
+    requestPayment(price + fee, `توصيل ${itemName}`, () => {
+      sounds.ride();
+      setToast(`طلبك بالطريق... 🛵 (${itemName} من ${shopName})`);
+      setTimeout(() => {
+        setInventory((inv) => ({ ...inv, [itemName]: (inv[itemName] || 0) + 1 }));
+        sounds.door();
+        setToast(`🛵📦 وصل طلبك: ${itemName} إلى بيتك!`);
+      }, 2200);
+    });
   };
 
   const doRide = (label) => { sounds.ride(); setToast(`${label}... استمتعت بالرحلة! 🛣️`); };
@@ -723,11 +898,12 @@ function LifeSimGame() {
   const buyTicket = () => {
     if (!airportPick) return;
     const total = airportPick.price * travelCount;
-    if (!pay(total, airportPick.name)) return;
-    sounds.ride();
-    setToast(`مبروك السفر! تذكرة إلى ${airportPick.name} لـ ${travelCount} ${travelCount > 1 ? "مسافرين" : "مسافر"} ✈️`);
-    setAirportPick(null); setTravelCount(1);
-    setModal(null);
+    requestPayment(total, airportPick.name, () => {
+      sounds.ride();
+      setToast(`مبروك السفر! تذكرة إلى ${airportPick.name} لـ ${travelCount} ${travelCount > 1 ? "مسافرين" : "مسافر"} ✈️`);
+      setAirportPick(null); setTravelCount(1);
+      setModal({ type: "shop", key: "airline" });
+    });
   };
 
   const closeModal = () => { setModal(null); setColorPickerFor(null); setAirportPick(null); setTravelCount(1); };
@@ -971,6 +1147,14 @@ function LifeSimGame() {
         { id: "perfumes", name: SHOPS.perfumes.name, emoji: SHOPS.perfumes.emoji, action: () => setModal({ type: "shop", key: "perfumes" }) },
         { id: "mallclothes", name: SHOPS.mallclothes.name, emoji: SHOPS.mallclothes.emoji, action: () => setModal({ type: "shop", key: "mallclothes" }) },
         { id: "jewelry", name: SHOPS.jewelry.name, sub: "خرز / فضة / ذهب", emoji: SHOPS.jewelry.emoji, action: () => setModal({ type: "shop", key: "jewelry" }) },
+        { id: "library", name: SHOPS.library.name, sub: "كراسات وقصص وكتب - اختر اللون", emoji: SHOPS.library.emoji, action: () => setModal({ type: "shop", key: "library" }) },
+      ],
+    },
+    {
+      title: "ألعاب الأطفال",
+      items: [
+        { id: "toysgirls", name: SHOPS.toysgirls.name, emoji: SHOPS.toysgirls.emoji, action: () => setModal({ type: "shop", key: "toysgirls" }) },
+        { id: "toysboys", name: SHOPS.toysboys.name, emoji: SHOPS.toysboys.emoji, action: () => setModal({ type: "shop", key: "toysboys" }) },
       ],
     },
     {
@@ -983,10 +1167,11 @@ function LifeSimGame() {
     {
       title: "خدمات عامة",
       items: [
-        { id: "hospital", name: "المستشفى", sub: "اعمل ممرض/طبيب", emoji: "🏥", action: () => setModal({ type: "quiz", pool: HOSPITAL_QUESTIONS, rounds: 3, payPerCorrect: 25, title: "العمل بالمستشفى" }) },
-        { id: "police", name: "قسم الشرطة", sub: "اعمل شرطي", emoji: "🚓", action: () => setModal({ type: "quiz", pool: POLICE_QUESTIONS, rounds: 3, payPerCorrect: 25, title: "العمل بالشرطة" }) },
-        { id: "firestation", name: "الإطفائية", sub: "اعمل رجل إطفاء", emoji: "🚒", action: () => setModal({ type: "quiz", pool: FIRE_QUESTIONS, rounds: 3, payPerCorrect: 25, title: "العمل بالإطفاء" }) },
+        { id: "hospital", name: "المستشفى", sub: "اعمل ممرض/طبيب", emoji: "🏥", action: () => setModal({ type: "quiz", pool: HOSPITAL_QUESTIONS, rounds: 4, payPerCorrect: 40, title: "العمل بالمستشفى" }) },
+        { id: "police", name: "قسم الشرطة", sub: "اعمل شرطي", emoji: "🚓", action: () => setModal({ type: "quiz", pool: POLICE_QUESTIONS, rounds: 4, payPerCorrect: 40, title: "العمل بالشرطة" }) },
+        { id: "firestation", name: "الإطفائية", sub: "اعمل رجل إطفاء", emoji: "🚒", action: () => setModal({ type: "quiz", pool: FIRE_QUESTIONS, rounds: 4, payPerCorrect: 40, title: "العمل بالإطفاء" }) },
         { id: "pharmacy", name: SHOPS.pharmacy.name, sub: "اطلب أو اشتغل بائع أدوية", emoji: SHOPS.pharmacy.emoji, action: () => setModal({ type: "shop", key: "pharmacy" }) },
+        { id: "maid", name: "خادمة منزلية", sub: "رتّبي البيوت - دقيقة كاملة لكل مهمة", emoji: "🧹", action: () => setModal({ type: "serve", key: "maid", shopName: SHOPS.maid.name }) },
       ],
     },
     {
@@ -1000,13 +1185,15 @@ function LifeSimGame() {
       title: "التعليم والعمل",
       items: [
         { id: "school", name: "المدرسة", sub: "ادرس كطالب أو اعمل كمعلّم", emoji: "🏫", action: schoolAction },
-        { id: "university", name: "الجامعة (اعمل)", emoji: "🎓", action: () => setModal({ type: "quiz", pool: QUIZ_QUESTIONS, rounds: 4, payPerCorrect: 35, title: "العمل بالجامعة" }) },
+        { id: "university", name: "الجامعة (اعمل)", emoji: "🎓", action: () => setModal({ type: "quiz", pool: QUIZ_QUESTIONS, rounds: 5, payPerCorrect: 55, title: "العمل بالجامعة" }) },
         { id: "delivery", name: "ديلفري", sub: ownedVehicles.length > 0 ? "وصّل طلبات لأرقام البيوت" : "تحتاج مركبة أول (إسطبل / معرض سيارات)", emoji: "🛵", action: () => {
             if (ownedVehicles.length === 0) { setToast("تحتاج مركبة عشان تشتغل ديلفري 🛵 جرّب الإسطبل أو معرض السيارات"); return; }
             setModal({ type: "delivery" });
           } },
         { id: "flightattendant", name: "مضيفة طيران", sub: "خدمة الركاب - دقيقة كاملة لكل طلب", emoji: "👩‍✈️", action: () => setModal({ type: "serve", key: "airline", shopName: "الطيران" }) },
         { id: "thief", name: "تحدي كسر الخزنة", sub: "خمّن الرمز بذكاء واربح الجائزة", emoji: "🕵️", action: () => setModal({ type: "thief" }) },
+        { id: "accountant", name: "محاسب", sub: "حلّ مسائل حسابية بسيطة", emoji: "🧮", action: () => setModal({ type: "quiz", pool: ACCOUNTANT_QUESTIONS, rounds: 4, payPerCorrect: 40, title: "العمل كمحاسب" }) },
+        { id: "noodleshop", name: "مطعم الأندومي", sub: "حضّري الطلب خطوة بخطوة - دقيقة كاملة", emoji: "🍜", action: () => setModal({ type: "noodle" }) },
       ],
     },
     {
@@ -1082,6 +1269,30 @@ function LifeSimGame() {
         </div>
       )}
 
+      {pendingPayment && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4" onClick={() => setPendingPayment(null)}>
+          <div onClick={(e) => e.stopPropagation()} className="bg-[#1A1A1A] rounded-2xl p-5 w-full max-w-xs text-center space-y-3">
+            <p className="text-xl font-bold text-[#F5F5F5]">ادفع {pendingPayment.price}$</p>
+            {pendingPayment.label && <p className="text-base text-[#AAAAAA]">{pendingPayment.label}</p>}
+            <p className="text-sm text-[#888888]">اختر طريقة الدفع</p>
+            <div className="flex gap-2">
+              <button onClick={() => {
+                  if (money < pendingPayment.price) { setToast("ما عندك نقدية كافية 😅"); return; }
+                  setMoney((m) => m - pendingPayment.price); sounds.cash();
+                  const cb = pendingPayment.onSuccess; setPendingPayment(null); cb();
+                }} className="flex-1 bg-[#2A9D8F] text-white font-bold py-2.5 rounded-xl">💵 كاش</button>
+              <button onClick={() => {
+                  if (!hasCard) { setToast("ما عندك بطاقة فيزا! اطلب وحدة من البنك 🏦"); return; }
+                  if (cardDebt + pendingPayment.price > creditLimit) { setToast("رصيد الفيزا ما يكفي 😅"); return; }
+                  setCardDebt((d) => d + pendingPayment.price); sounds.cash();
+                  const cb = pendingPayment.onSuccess; setPendingPayment(null); cb();
+                }} className="flex-1 bg-gradient-to-l from-[#4A00E0] to-[#8E2DE2] text-white font-bold py-2.5 rounded-xl disabled:opacity-40">💳 فيزا</button>
+            </div>
+            <button onClick={() => setPendingPayment(null)} className="text-sm text-[#888888] underline">إلغاء</button>
+          </div>
+        </div>
+      )}
+
       {modal && (
         <div className="fixed inset-0 bg-black/40 flex items-end sm:items-center justify-center z-40 p-3" onClick={closeModal}>
           <div onClick={(e) => e.stopPropagation()} className="bg-[#1A1A1A] rounded-3xl w-full max-w-sm p-5 max-h-[80vh] overflow-y-auto shadow-2xl">
@@ -1098,6 +1309,7 @@ function LifeSimGame() {
                 {modal.type === "airport" && "المطار ✈️"}
                 {modal.type === "gymChoice" && "الصالة الرياضية 🏋️"}
                 {modal.type === "thief" && "تحدي كسر الخزنة 🕵️"}
+                {modal.type === "noodle" && "مطعم الأندومي 🍜"}
                 {modal.type === "schoolChoice" && "المدرسة 🏫"}
                 {modal.type === "sellHouse" && "بيع المنزل 🏷️"}
                 {modal.type === "chat" && `محادثة مع ${modal.botName} 💬`}
@@ -1121,19 +1333,48 @@ function LifeSimGame() {
                   <p className="text-[#AAAAAA] text-base">ما عندك بيت بعد.</p>
                 )}
 
-                {Object.keys(inventory).length > 0 && (
-                  <>
-                    <p className="text-base font-semibold text-[#F5F5F5] pt-2">أغراضي بالبيت (رتّبها)</p>
-                    <div className="space-y-1.5">
-                      {Object.entries(inventory).map(([name, qty]) => (
-                        <div key={name} className="flex justify-between items-center bg-[#242424] rounded-xl px-3 py-2">
-                          <span className="text-base font-medium text-[#F5F5F5]">{name} (x{qty})</span>
-                          <button onClick={() => discardItem(name)} className="text-2xl">🗑️</button>
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                )}
+                {Object.keys(inventory).length > 0 && (() => {
+                  const rooms = getAvailableRooms(house);
+                  const groups = {};
+                  Object.entries(inventory).forEach(([name, qty]) => {
+                    const rid = itemRooms[name] && rooms.some((r) => r.id === itemRooms[name]) ? itemRooms[name] : "unsorted";
+                    if (!groups[rid]) groups[rid] = [];
+                    groups[rid].push([name, qty]);
+                  });
+                  const order = ["unsorted", ...rooms.map((r) => r.id)];
+                  return (
+                    <>
+                      <p className="text-base font-semibold text-[#F5F5F5] pt-2">أغراضي بالبيت (رتّبها بالغرف)</p>
+                      <div className="space-y-3">
+                        {order.filter((rid) => groups[rid]).map((rid) => {
+                          const roomInfo = ALL_ROOMS.find((r) => r.id === rid);
+                          return (
+                            <div key={rid}>
+                              <p className="text-sm font-bold text-[#F4A261] mb-1 text-right">
+                                {rid === "unsorted" ? "🗂️ غير مرتب" : `${roomInfo.emoji} ${roomInfo.name}`}
+                              </p>
+                              <div className="space-y-1.5">
+                                {groups[rid].map(([name, qty]) => (
+                                  <div key={name} className="flex justify-between items-center gap-2 bg-[#242424] rounded-xl px-3 py-2">
+                                    <span className="text-base font-medium text-[#F5F5F5] flex-1">{name} (x{qty})</span>
+                                    <select value={itemRooms[name] || ""} onChange={(e) => assignRoom(name, e.target.value)}
+                                      className="bg-[#1A1A1A] text-[#F5F5F5] text-sm rounded-lg border border-[#333333] px-1.5 py-1">
+                                      <option value="">ضعه في...</option>
+                                      {rooms.map((r) => (
+                                        <option key={r.id} value={r.id}>{r.emoji} {r.name}</option>
+                                      ))}
+                                    </select>
+                                    <button onClick={() => discardItem(name)} className="text-xl">🗑️</button>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </>
+                  );
+                })()}
 
                 <p className="text-base font-semibold text-[#F5F5F5] pt-2">خزانة الملابس</p>
                 <div className="flex gap-2 flex-wrap justify-center">
@@ -1168,11 +1409,11 @@ function LifeSimGame() {
 
             {modal.type === "schoolChoice" && (
               <div className="space-y-2">
-                <button onClick={() => setModal({ type: "quiz", pool: QUIZ_QUESTIONS, rounds: 3, payPerCorrect: 15, title: "واجب المدرسة" })}
+                <button onClick={() => setModal({ type: "quiz", pool: QUIZ_QUESTIONS, rounds: 4, payPerCorrect: 25, title: "واجب المدرسة" })}
                   className="w-full flex items-center gap-3 bg-[#242424] rounded-xl px-4 py-3 text-right">
                   <span className="text-4xl">📚</span><span className="font-semibold text-[#F5F5F5]">ادرس كطالب</span>
                 </button>
-                <button onClick={() => setModal({ type: "quiz", pool: QUIZ_QUESTIONS, rounds: 4, payPerCorrect: 25, title: "التدريس بالمدرسة" })}
+                <button onClick={() => setModal({ type: "quiz", pool: QUIZ_QUESTIONS, rounds: 5, payPerCorrect: 40, title: "التدريس بالمدرسة" })}
                   className="w-full flex items-center gap-3 bg-[#242424] rounded-xl px-4 py-3 text-right">
                   <span className="text-4xl">🍎</span><span className="font-semibold text-[#F5F5F5]">اعمل كمعلّم</span>
                 </button>
@@ -1203,21 +1444,40 @@ function LifeSimGame() {
                 {["cafe", "restaurant", "supermarket"].includes(modal.key) && (
                   <p className="text-sm text-[#888888] text-center -mt-1 mb-1">🛍️ اشترِ بنفسك أو 🛵 اطلب توصيل لبيتك (+5$)</p>
                 )}
-                {SHOPS[modal.key].items.map(([name, price]) => (
-                  <div key={name} className="w-full flex items-center gap-2">
-                    <button onClick={() => buyItem(name, price)}
-                      className="flex-1 flex justify-between items-center bg-[#242424] hover:bg-[#2A2A2A] rounded-xl px-4 py-2.5">
-                      <span className="font-medium text-[#F5F5F5]">{name} {inventory[name] ? `(x${inventory[name]})` : ""}</span>
-                      <span className="font-bold text-green-700">{price}$</span>
-                    </button>
-                    {["cafe", "restaurant", "supermarket"].includes(modal.key) && (
-                      <button onClick={() => orderDelivery(name, price, SHOPS[modal.key].name)}
-                        title="اطلب توصيل" className="shrink-0 bg-[#F4A261] text-white rounded-xl px-3 py-2.5 font-bold">
-                        🛵
+                {SHOPS[modal.key].items.map(([name, price]) => {
+                  const needsColor = modal.key === "library" && NOTEBOOK_ITEMS.includes(name);
+                  if (needsColor && pendingLibItem?.name === name) {
+                    return (
+                      <div key={name} className="bg-[#242424] rounded-xl p-3 space-y-2">
+                        <p className="text-sm text-[#AAAAAA]">اختر لون {name}:</p>
+                        <div className="flex gap-2 flex-wrap">
+                          {CAR_COLORS.map((col) => (
+                            <button key={col} onClick={() => { buyItem(`${name} (${col})`, price); setPendingLibItem(null); }}
+                              className="px-3 py-1.5 rounded-lg text-sm font-bold bg-[#1A1A1A] border-2 border-[#333333] text-[#F5F5F5]">
+                              {col}
+                            </button>
+                          ))}
+                          <button onClick={() => setPendingLibItem(null)} className="px-3 py-1.5 rounded-lg text-sm text-[#888888] underline">إلغاء</button>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return (
+                    <div key={name} className="w-full flex items-center gap-2">
+                      <button onClick={() => needsColor ? setPendingLibItem({ name, price }) : buyItem(name, price)}
+                        className="flex-1 flex justify-between items-center bg-[#242424] hover:bg-[#2A2A2A] rounded-xl px-4 py-2.5">
+                        <span className="font-medium text-[#F5F5F5]">{name} {inventory[name] ? `(x${inventory[name]})` : ""}</span>
+                        <span className="font-bold text-green-700">{price}$</span>
                       </button>
-                    )}
-                  </div>
-                ))}
+                      {["cafe", "restaurant", "supermarket"].includes(modal.key) && (
+                        <button onClick={() => orderDelivery(name, price, SHOPS[modal.key].name)}
+                          title="اطلب توصيل" className="shrink-0 bg-[#F4A261] text-white rounded-xl px-3 py-2.5 font-bold">
+                          🛵
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
                 {["cafe", "restaurant", "supermarket", "salon", "pharmacy"].includes(modal.key) && (
                   <button onClick={() => setModal({ type: "serve", key: modal.key, shopName: SHOPS[modal.key].name })}
                     className="w-full bg-[#F4A261] text-white font-bold py-2.5 rounded-xl mt-2">
@@ -1327,13 +1587,22 @@ function LifeSimGame() {
                 }} />
             )}
 
+            {modal.type === "noodle" && (
+              <NoodleGame rounds={5} timeLimit={60} sounds={sounds}
+                onFinish={(earned, total) => {
+                  setMoney((m) => m + earned);
+                  setToast(`خلصت الدوام! حضّرت ${total} طلبات وربحت ${earned}$`);
+                  setTimeout(() => setModal(null), 300);
+                }} />
+            )}
+
             {modal.type === "gymChoice" && (
               <div className="space-y-2">
                 <button onClick={() => { sounds.click(); setToast("تمرين رائع! حسّيت بنشاط 💪"); closeModal(); }}
                   className="w-full flex items-center gap-3 bg-[#242424] rounded-xl px-4 py-3 text-right">
                   <span className="text-3xl">💪</span><span className="font-semibold text-[#F5F5F5]">تمرّن</span>
                 </button>
-                <button onClick={() => setModal({ type: "quiz", pool: QUIZ_QUESTIONS, rounds: 3, payPerCorrect: 20, title: "العمل كمدرب لياقة" })}
+                <button onClick={() => setModal({ type: "quiz", pool: QUIZ_QUESTIONS, rounds: 4, payPerCorrect: 35, title: "العمل كمدرب لياقة" })}
                   className="w-full flex items-center gap-3 bg-[#242424] rounded-xl px-4 py-3 text-right">
                   <span className="text-3xl">🏋️</span><span className="font-semibold text-[#F5F5F5]">اعمل كمدرب</span>
                 </button>
